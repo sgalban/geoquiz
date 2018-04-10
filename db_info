@@ -1,0 +1,6 @@
+Database connection info:
+
+username: geo_dev
+password: geo_dev
+
+URI: mongodb://geo_dev:geo_dev@ds039674.mlab.com:39674/cis450_geoquiz
