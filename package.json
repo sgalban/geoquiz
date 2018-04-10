@@ -1,0 +1,23 @@
+{
+  "name": "geoquiz",
+  "version": "0.0.1",
+  "description": "A geographical quiz game",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.13.3"
+  },
+  "engines": {
+    "node": "4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sgalban/geoquiz"
+  },
+  "keywords": [
+    "node",
+    "express"
+  ]
+}
