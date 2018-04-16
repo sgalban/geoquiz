@@ -1,0 +1,17 @@
+#quizBG {
+    position: absolute;
+    background-image: url(../img/globeBG.jpeg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+}
+
+#timer {
+    position: absolute;
+    height: 3%;
+    width: 100%;
+    background-color: red;
+    margin: 0;
+    padding: 0;
+}
