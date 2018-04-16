@@ -1,6 +1,11 @@
+<!doctype html5>
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <title>Geoquiz</title>
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -10,19 +15,26 @@
         $(document.body).click(function() {
             $("#spaceBG").css("animation", "none");
             $("#earthBG").css("animation", "none");
-            $("#globe").css("animation", "none");
+            $("#logo-container").css("animation", "none");
+            $("#logo").css("animation", "none");
+            $("#buttons").css("animation", "none");
         });
     </script>
     
     <div id="earthBG">
-        <div id="logo"></div>
         <div id="names"> Steven Galban, Griffin Bassman, Elan Sharony, Akshay Chandramouli</div>
     </div>
     
-    <div id="globe">
+    <div id="logo-container">
+        <div id="globe"></div>
+        <div id="logo"></div>
     </div>
     
-
+    <div id="buttons">
+        <a class="btn btn-primary" href="#" roll="button">Take Quiz</a>
+        <a class="btn btn-primary" href="#" roll="button">View Scores</a>
+    </div>
+    
 </body>
 
 </html>
