@@ -8,5 +8,5 @@ URI: mongodb://geo_dev:geo_dev@ds039674.mlab.com:39674/cis450_geoquiz
 JSON files pulled from: https://github.com/factbook/factbook.json
 
 To connect using the mongo shell:
-mongo ds039674.mlab.com:39674/cis450_geoquiz -u <dbuser> -p <dbpassword>
+mongo ds039674.mlab.com:39674/cis450_geoquiz -u geo_dev -p geo_dev
 
