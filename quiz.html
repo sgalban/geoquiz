@@ -6,52 +6,59 @@
     <title>Geoquiz</title>
     
     <link rel="stylesheet" type="text/css" href="css/quiz.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
     <script src="scripts/quiz-start.js"></script>
 </head>
 
-<body ng-app="Quiz" id="quizBG" ng-controller="questionController">
+<body ng-app="Quiz" id="quizBG">
+    <ng-view ng-controller="questionController">
 
-    <div id="question" class="outline">
-        {{ questionData.text }}            
-    </div>
+        <div id="question" class="outline">
+            {{ questionData.text }}            
+        </div>
+    
+        <div id="correctness" class="outline">
+        Correct
+        </div>
     
 
-    <div id="timer">
-    </div>
+        <div id="timer">
+        </div>
     
-    <div id="answers">
-        <table>
-            <tr>
-                <td>
-                    <div ng-click="verify($event)" class="answer" value="0">
-                        <span>{{ questionData.answers[0] }}</span>
-                    </div>
-                </td>
-                <td>
-                    <div ng-click="verify($event)" class="answer" value="1">
-                        <span>{{ questionData.answers[1] }}</span>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div ng-click="verify($event)" class="answer" value="2">
-                        <span>{{ questionData.answers[2] }}</span>
-                    </div>
-                </td>
-                <td>
-                    <div ng-click="verify($event)" class="answer" value="3">
-                        <span>{{ questionData.answers[3] }}</span>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
+        <div id="answers">
+            <table>
+                <tr>
+                    <td>
+                        <div ng-click="verify($event)" class="answer" value="0">
+                            <span>{{ questionData.answers[0] }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-click="verify($event)" class="answer" value="1">
+                            <span>{{ questionData.answers[1] }}</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div ng-click="verify($event)" class="answer" value="2">
+                            <span>{{ questionData.answers[2] }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-click="verify($event)" class="answer" value="3">
+                            <span>{{ questionData.answers[3] }}</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
     
-    <div id="score" class="outline">
-        Score: {{ "0".repeat(4-(score + "").length) + score }}
-    </div>
+        <div id="score" class="outline">
+            Score: {{ "0".repeat(4-(score + "").length) + score }}
+        </div>
+    </ng-view>
 </body>
 
 </html>

@@ -13,8 +13,9 @@ var curQues = {
         "Answer 2",
         "Answer 3"
     ],
-    correct: 2
+    correct: 2 // This answer is also a placeholder
 };
+var ready = true;
 
 var score = 0;
 
@@ -32,14 +33,20 @@ app.get('/quiz', function(req, res) {
    the correct answer in the response. The order of the answers
    should not indicate which one is correct */
 app.get('/generate-question', function(req, res) {
-
-    //TODO: Update curQues here
+    if(ready) {
+        ready = false;
+                
+        //TODO: Update curQues here
     
-    var questionInfo = {
-        text: curQues.text,
-        answers: curQues.answers
+        var questionInfo = {
+            text: curQues.text,
+            answers: curQues.answers
+        }
+        res.send(questionInfo);
     }
-    res.send(questionInfo);
+    else {
+        res.send("Not Ready");
+    }
 });
 
 /* Verify that the selected answer is correct */
@@ -53,6 +60,11 @@ app.get('/verify-answer', function(req, res) {
         score = Math.max(score - 10, 0);
         res.send({newScore: score, correct: false});
     }
+    
+    // Wait half a second before generating the next question
+    setTimeout(function() {
+        ready = true;
+    }, 500);
 });
 
 
