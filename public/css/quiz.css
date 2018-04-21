@@ -1,3 +1,10 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
 #quizBG {
     position: absolute;
     background-image: url(../img/globeBG.jpeg);
@@ -9,9 +16,30 @@
 
 #timer {
     position: absolute;
-    height: 3%;
+    height: 5%;
     width: 100%;
-    background-color: red;
+    background-color: blue;
+    opacity: 0.25;
     margin: 0;
     padding: 0;
+}
+
+#question {
+    font-family: "Helvetica";
+    font-size: 24pt;
+    font-weight: bold;
+    text-align: center;
+    color: #111111;
+    position: absolute;
+    width: 60%;
+    left: 20%;
+    top: 20%;
+}
+
+.outline {
+    text-shadow:
+    -1px -1px 0 #AAA,
+    1px -1px 0 #AAA,
+    -1px 1px 0 #AAA,
+    1px 1px 0 #AAA;  
 }
