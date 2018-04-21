@@ -14,6 +14,14 @@ html, body {
     overflow: hidden;
 }
 
+#score {
+    position: absolute;
+    bottom: 2%;
+    left: 2%;
+    font-family: "Helvetica";
+    font-size: 20pt;
+}
+
 #timer {
     position: absolute;
     height: 5%;
@@ -76,6 +84,7 @@ html, body {
 .answer:hover {
     background-color: rgba(189, 216, 123, 0.8);
     border-color: rgb(94, 108, 62);
+    cursor: pointer;
 }
 
 .outline {
