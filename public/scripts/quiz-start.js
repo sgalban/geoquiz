@@ -10,6 +10,11 @@ app.controller("questionController", function($scope, $http) {
     });
     
     $scope.verify = function($event) {
-        $event.currentTarget.getAttribute("value");
+        var selectedAnswer = parseInt($event.currentTarget.getAttribute("value"));
+        var request = $http({
+            url     : "/verify-answer",
+            method  : "GET",
+            params  : {selected: selectedAnswer}
+        });
     }
 });

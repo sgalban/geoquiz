@@ -42,7 +42,15 @@ app.get('/generate-question', function(req, res) {
 
 /* Verify that the selected answer is correct */
 app.get('/verify-answer', function(req, res) {
-    //TODO
+    var selectedAnswer = req.query.selected;
+    if (selectedAnswer == curQues.correct) {
+        console.log("Correct");
+        // TODO: Handle correct answer
+    }
+    else {
+        console.log("Wrong");
+        // TODO: Handle incorrect answer
+    }
 });
 
 
