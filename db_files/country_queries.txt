@@ -1,0 +1,21 @@
+//population of a country given its code is 'mx'
+
+db.all.find({"Code": "mx"}, {"People and Society.Population.text": 1}).pretty()
+
+//energy consump
+
+db.all.find({"Code": "mx"}, {"Energy.Electricity - consumption.text": 1}).pretty()
+
+//govt type
+
+db.all.find({"Code": "mx"}, {"Government.Government type.text": 1}).pretty()
+
+//internet users
+
+db.all.find({"Code": "mx"}, {"Communications.Internet users.total.text": 1}).pretty()
+
+//budget surplus
+
+db.all.find({"Code": "mx"}, {"Economy.Budget surplus (+) or deficit (-)": 1}).pretty()
+
+
