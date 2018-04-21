@@ -5,6 +5,15 @@ var app = express();
 app.set('port', (process.env.PORT || 8888));
 app.use(express.static(__dirname + '/public'));
 
+var curQues = {
+    text: "This is a placeholder question",
+    answer1: "Answer 1",
+    answer2: "Answer 2",
+    answer3: "Answer 3",
+    answer4: "Answer 4",
+    correct: 3
+};
+
 /* Get the main page html */
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, "/", "main.html"));
@@ -19,20 +28,25 @@ app.get('/quiz', function(req, res) {
    the correct answer in the response. The order of the answers
    should not indicate which one is correct */
 app.get('/generate-question', function(req, res) {
-    //TODO: This is a placeholder. Remember to query the DB
-    res.send({
-        question: "Placeholder Question",
-        answer1: "Answer 1",
-        answer2: "Answer 2",
-        answer3: "Answer 3",
-        answer4: "Answer 4"
-    });
+
+    //TODO: Update curQues here
+    
+    
+    var questionInfo = {
+        text: curQues.text,
+        answer1: curQues.answer1,
+        answer2: curQues.answer2,
+        answer3: curQues.answer3,
+        answer4: curQues.answer4
+    }
+    res.send(questionInfo);
 });
 
 /* Verify that the selected answer is correct */
 app.get('/verify-answer', function(req, res) {
     //TODO
 });
+
 
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
