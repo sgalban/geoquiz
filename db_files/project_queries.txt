@@ -1,0 +1,52 @@
+// ** Convers Fields from string to int for area categories
+// ie. "1,304,839 sq km" -> 1304839 
+
+db.all.find().forEach( function (x) {
+ var int_val = parseFloat(x.Geography.Area.total.text.split(",").join(""));
+ x.Geography.Area.total.text = parseInt(int_val)
+ db.all.save(x);
+});
+
+db.all.find().forEach( function (x) {
+ var int_val = parseFloat(x.Geography.Area.land.text.split(",").join(""));
+ x.Geography.Area.land.text = parseInt(int_val)
+ db.all.save(x);
+});
+
+db.all.find().forEach( function (x) {
+ var int_val = parseFloat(x.Geography.Area.water.text.split(",").join(""));
+ x.Geography.Area.water.text = parseInt(int_val)
+ db.all.save(x);
+});
+
+// ** Finds max total area **
+
+db.all.aggregate(
+   [
+     {
+       $group:
+         {
+           _id: null,
+           max_val: { $max: "$Geography.Area.total.text"}
+         }
+     }
+   ]
+)
+
+// ** Sorts countries by total area
+
+db.all.aggregate(
+   [
+     {
+       $group:
+         {
+           _id: {Country: "$Government.Country name.conventional short form.text"},
+           area: { $max: "$Geography.Area.total.text"},
+         }
+     },
+     { $sort: {area: -1}},
+     {"$project": {"_id":0,"Country": "$_id.Country", "Area": "$area"} }
+   ]
+)
+
+
