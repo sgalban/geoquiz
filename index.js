@@ -16,6 +16,8 @@ var curQues = {
     correct: 2
 };
 
+var score = 0;
+
 /* Get the main page html */
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, "/", "main.html"));
@@ -44,12 +46,12 @@ app.get('/generate-question', function(req, res) {
 app.get('/verify-answer', function(req, res) {
     var selectedAnswer = req.query.selected;
     if (selectedAnswer == curQues.correct) {
-        console.log("Correct");
-        // TODO: Handle correct answer
+        score += 20;
+        res.send({newScore: score, correct: true});
     }
     else {
-        console.log("Wrong");
-        // TODO: Handle incorrect answer
+        score = Math.max(score - 10, 0);
+        res.send({newScore: score, correct: false});
     }
 });
 
