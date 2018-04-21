@@ -1,3 +1,10 @@
+@keyframes timer-shrink {
+    0%      {width: 100%; background-color: blue}
+    50%     {background-color: green}
+    75%     {background-color: yellow}
+    100%    {width: 0%; background-color: red}
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -24,12 +31,15 @@ html, body {
 
 #timer {
     position: absolute;
-    height: 5%;
-    width: 100%;
-    background-color: blue;
-    opacity: 0.25;
+    height: 2%;
+    width: 0%;
+    background-color: red;
+    opacity: 0.5;
     margin: 0;
     padding: 0;
+    animation: timer-shrink;
+    animation-duration: 120s;
+    animation-timing-function: linear;
 }
 
 #question {
@@ -82,8 +92,8 @@ html, body {
 }
 
 .answer:hover {
-    background-color: rgba(189, 216, 123, 0.8);
-    border-color: rgb(94, 108, 62);
+    background-color: rgba(126, 123, 216, 0.8);
+    border-color: rgb(94, 62, 108);
     cursor: pointer;
 }
 
