@@ -6,12 +6,14 @@
     <title>Geoquiz</title>
     
     <link rel="stylesheet" type="text/css" href="css/quiz.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
+    <script src="scripts/quiz-start.js"></script>
 </head>
 
-<body ng-app="Quiz" id="quizBG">
+<body ng-app="Quiz" id="quizBG" ng-controller="questionController">
 
-    <div ng-controller="question-display" id="question" class="outline">
-        This is just a placeholder            
+    <div id="question" class="outline">
+        {{ questionData.question }}            
     </div>
     
 
@@ -22,18 +24,18 @@
         <table>
             <tr>
                 <td>
-                    <div class="answer"><span>Test 1</span></div>
+                    <div class="answer"><span>{{ questionData.answer1 }}</span></div>
                 </td>
                 <td>
-                    <div class="answer"><span>Test 2</span></div>
+                    <div class="answer"><span>{{ questionData.answer2 }}</span></div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div class="answer"><span>Test 3</span></div>
+                    <div class="answer"><span>{{ questionData.answer3 }}</span></div>
                 </td>
                 <td>
-                    <div class="answer"><span>Test 4</span></div>
+                    <div class="answer"><span>{{ questionData.answer4 }}</span></div>
                 </td>
             </tr>
         </table>
