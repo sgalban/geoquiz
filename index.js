@@ -7,11 +7,13 @@ app.use(express.static(__dirname + '/public'));
 
 var curQues = {
     text: "This is a placeholder question",
-    answer1: "Answer 1",
-    answer2: "Answer 2",
-    answer3: "Answer 3",
-    answer4: "Answer 4",
-    correct: 3
+    answers: [
+        "Answer 0",
+        "Answer 1",
+        "Answer 2",
+        "Answer 3"
+    ],
+    correct: 2
 };
 
 /* Get the main page html */
@@ -31,13 +33,9 @@ app.get('/generate-question', function(req, res) {
 
     //TODO: Update curQues here
     
-    
     var questionInfo = {
         text: curQues.text,
-        answer1: curQues.answer1,
-        answer2: curQues.answer2,
-        answer3: curQues.answer3,
-        answer4: curQues.answer4
+        answers: curQues.answers
     }
     res.send(questionInfo);
 });

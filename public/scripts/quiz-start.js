@@ -8,4 +8,8 @@ app.controller("questionController", function($scope, $http) {
     req.error(function(data) {
         console.log("Error: Cannot GET question");
     });
+    
+    $scope.verify = function($event) {
+        $event.currentTarget.getAttribute("value");
+    }
 });

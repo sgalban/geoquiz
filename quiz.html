@@ -24,18 +24,26 @@
         <table>
             <tr>
                 <td>
-                    <div class="answer"><span>{{ questionData.answer1 }}</span></div>
+                    <div ng-click="verify($event)" class="answer" value="0">
+                        <span>{{ questionData.answers[0] }}</span>
+                    </div>
                 </td>
                 <td>
-                    <div class="answer"><span>{{ questionData.answer2 }}</span></div>
+                    <div ng-click="verify($event)" class="answer" value="1">
+                        <span>{{ questionData.answers[1] }}</span>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <div class="answer"><span>{{ questionData.answer3 }}</span></div>
+                    <div ng-click="verify($event)" class="answer" value="2">
+                        <span>{{ questionData.answers[2] }}</span>
+                    </div>
                 </td>
                 <td>
-                    <div class="answer"><span>{{ questionData.answer4 }}</span></div>
+                    <div ng-click="verify($event)" class="answer" value="3">
+                        <span>{{ questionData.answers[3] }}</span>
+                    </div>
                 </td>
             </tr>
         </table>
