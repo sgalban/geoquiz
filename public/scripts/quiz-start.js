@@ -1,6 +1,15 @@
 var app = angular.module("Quiz", []);
 
+var endGame = function() {
+    $("#answers").remove();
+    $("#correctness").remove();
+    $("#question").remove();
+    $("#finish").css("visibility", "visible");
+}
+
 app.controller("questionController", function($scope, $http) {
+
+    setTimeout(endGame, 1000 * 90);
 
     var newQuestion = function() {
     

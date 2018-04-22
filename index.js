@@ -38,13 +38,18 @@ app.get('/quiz', function(req, res) {
   res.sendFile(path.join(__dirname, "/", "quiz.html"));
   req.session.ready = true;
   req.session.score = 0;
+  req.session.finished = false;
+  setTimeout(function() {
+    req.session.finished = true;
+    req.session.save(function(err){});
+  }, 1000 * 90);
 });
 
 /* Create a question, as well as 4 sample answers. Do not send
    the correct answer in the response. The order of the answers
    should not indicate which one is correct */
 app.get('/generate-question', function(req, res) {
-    if(req.session.ready) {
+    if(req.session.ready && ! req.session.finished) {
         req.session.ready = false;
                 
         req.session.curQues = generateNextQuestion();
@@ -62,21 +67,26 @@ app.get('/generate-question', function(req, res) {
 
 /* Verify that the selected answer is correct */
 app.get('/verify-answer', function(req, res) {
-    var selectedAnswer = req.query.selected;
-    if (selectedAnswer == req.session.curQues.correct) {
-        req.session.score += 20;
-        res.send({newScore: req.session.score, correct: true});
+    if(req.session.finished) {
+        res.send("Game Finished");
     }
     else {
-        req.session.score = Math.max(req.session.score - 10, 0);
-        res.send({newScore: req.session.score, correct: false});
-    }
+        var selectedAnswer = req.query.selected;
+        if (selectedAnswer == req.session.curQues.correct) {
+            req.session.score += 20;
+            res.send({newScore: req.session.score, correct: true});
+        }
+        else {
+            req.session.score = Math.max(req.session.score - 10, 0);
+            res.send({newScore: req.session.score, correct: false});
+        }
     
-    // Wait half a second before generating the next question
-    setTimeout(function() {
-        req.session.ready = true;
-        req.session.save(function(err){});
-    }, 500);
+        // Wait half a second before generating the next question
+        setTimeout(function() {
+            req.session.ready = true;
+            req.session.save(function(err){});
+        }, 500);
+    }
 });
 
 
