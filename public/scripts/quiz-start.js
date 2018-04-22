@@ -1,15 +1,18 @@
 var app = angular.module("Quiz", []);
 
-var endGame = function() {
-    $("#answers").remove();
-    $("#correctness").remove();
-    $("#question").remove();
-    $("#finish").css("visibility", "visible");
-}
+app.controller("questionController", function($scope, $http, $window) {
 
-app.controller("questionController", function($scope, $http) {
+    var endGame = function() {
+        $("#answers").remove();
+        $("#correctness").remove();
+        $("#question").remove();
+        $("#finish").css("visibility", "visible");
+        setTimeout(function() {
+            $window.location.href = "/submission";
+        }, 1000 * 2);
+    }
 
-    setTimeout(endGame, 1000 * 90);
+    setTimeout(endGame, 1000 * 10);
 
     var newQuestion = function() {
     

@@ -1,0 +1,26 @@
+<!doctype html5>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>GE🌎QUIZ</title>
+    
+    <link rel="stylesheet" type="text/css" href="css/submission.css">
+    <link rel="stylesheet" type="text/css" href="css/elements.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
+    <script src="scripts/score-submit.js"></script>
+</head>
+
+<body ng-app="Submit">
+    <div ng-controller="submissionController" id="submission-form">
+        <form action="/submit-score" method="post">
+            <span> Enter your name </span>
+            <input type="text" name="username" id="name-field" class="text-field">
+            <span> Score: {{ score }} </span>
+            <input type="submit" value="Submit" id="submit-button" class="btn-main">
+        </form>
+    </div>
+</body>
+
+</html>

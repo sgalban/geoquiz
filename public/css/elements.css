@@ -1,0 +1,33 @@
+.outline {
+    text-shadow:
+    -1px -1px 0 #AAA,
+    1px -1px 0 #AAA,
+    -1px 1px 0 #AAA,
+    1px 1px 0 #AAA;  
+}
+
+.text-field {
+    background-color: rgba(125, 125, 125, 0.7);
+    border-radius: 15px;
+    font-family: "Helvetica";
+    font-size: 20pt;
+}
+
+.btn-main {
+    text-align: center;
+    background-color: rgba(126, 216, 123, 0.8);
+    border-color: rgb(63, 108, 62);
+    border-style: solid;
+    border-radius: 15px;
+    font-family: "Helvetica";
+    font-size: 16pt;
+    color: rgb(27, 35, 89);
+    overflow: hidden;
+    display: table;
+}
+
+.btn-main:hover {
+    background-color: rgba(126, 123, 216, 0.8);
+    border-color: rgb(94, 62, 108);
+    cursor: pointer;
+}

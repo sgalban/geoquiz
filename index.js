@@ -39,10 +39,23 @@ app.get('/quiz', function(req, res) {
   req.session.ready = true;
   req.session.score = 0;
   req.session.finished = false;
+  req.session.save(function(err){});
   setTimeout(function() {
-    req.session.finished = true;
-    req.session.save(function(err){});
-  }, 1000 * 90);
+    req.session.reload(function(err){
+        req.session.finished = true;
+        req.session.save(function(err){});
+    });
+  }, 1000 * 10);
+});
+
+/* Get the score submission page html */
+app.get('/submission', function (req, res) {
+    if(req.session.finished) {
+        res.sendFile(path.join(__dirname, "/", "submission.html"));
+    }
+    else {
+        res.sendFile(path.join(__dirname, "/", "main.html"));
+    }
 });
 
 /* Create a question, as well as 4 sample answers. Do not send
@@ -74,10 +87,12 @@ app.get('/verify-answer', function(req, res) {
         var selectedAnswer = req.query.selected;
         if (selectedAnswer == req.session.curQues.correct) {
             req.session.score += 20;
+            req.session.save(function(err){});
             res.send({newScore: req.session.score, correct: true});
         }
         else {
             req.session.score = Math.max(req.session.score - 10, 0);
+            req.session.save(function(err){});
             res.send({newScore: req.session.score, correct: false});
         }
     
@@ -89,6 +104,10 @@ app.get('/verify-answer', function(req, res) {
     }
 });
 
+/* Retrieve the user's last score */
+app.get("/retrieve-score", function(req, res) {
+    res.send({score: req.session.score});
+});
 
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
