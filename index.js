@@ -11,20 +11,22 @@ app.use(session({
     saveUninitialized: false
 }));
 
-/*
-var curQues = {
-    text: "This is a placeholder question",
-    answers: [
-        "Answer 0",
-        "Answer 1",
-        "Answer 2",
-        "Answer 3"
-    ],
-    correct: 2 // This answer is also a placeholder
-};
-var ready = true;
-
-var score = 0;*/
+function generateNextQuestion() {
+    // This is a placeholder question
+    // Replace it with a new question based off our template questions
+    var nextQuestion = {
+            text: "This is a placeholder question",
+            answers: [
+                "Answer 0",
+                "Answer 1",
+                "Answer 2",
+                "Answer 3"
+            ],
+            correct: 2
+    };
+    
+    return nextQuestion
+}
 
 /* Get the main page html */
 app.get('/', function(req, res) {
@@ -45,19 +47,7 @@ app.get('/generate-question', function(req, res) {
     if(req.session.ready) {
         req.session.ready = false;
                 
-        //TODO: Update curQues here
-        
-        // And get rid of this
-        req.session.curQues = {
-            text: "This is a placeholder question",
-            answers: [
-                "Answer 0",
-                "Answer 1",
-                "Answer 2",
-                "Answer 3"
-            ],
-            correct: 2
-        };
+        req.session.curQues = generateNextQuestion();
     
         var questionInfo = {
             text: req.session.curQues.text,
