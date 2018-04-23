@@ -1,6 +1,7 @@
 var express = require('express');
 var session = require("express-session");
 var path = require("path");
+var bodyParser = require("body-parser");
 var app = express();
 
 app.set('port', (process.env.PORT || 8888));
@@ -10,6 +11,10 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
 function generateNextQuestion() {
     // This is a placeholder question
@@ -39,10 +44,12 @@ app.get('/quiz', function(req, res) {
   req.session.ready = true;
   req.session.score = 0;
   req.session.finished = false;
+  req.session.submitted = true;
   req.session.save(function(err){});
   setTimeout(function() {
     req.session.reload(function(err){
         req.session.finished = true;
+        req.session.submitted = false;
         req.session.save(function(err){});
     });
   }, 1000 * 10);
@@ -107,6 +114,20 @@ app.get('/verify-answer', function(req, res) {
 /* Retrieve the user's last score */
 app.get("/retrieve-score", function(req, res) {
     res.send({score: req.session.score});
+});
+
+
+/* Submit the user's most recent score to the database */
+app.post("/submit-score", function(req, res) {
+    req.session.username = req.body.username; // Should probably sanitize
+    if (req.session.submitted) {
+        res.send("Cannot submit again");
+    }
+    else {
+        // This is where we update the db
+        res.sendFile(path.join(__dirname, "/", "main.html")); // Make a new page later
+    }
+    
 });
 
 app.listen(app.get('port'), function() {

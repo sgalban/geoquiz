@@ -32,3 +32,23 @@
     border-color: rgb(94, 62, 108);
     cursor: pointer;
 }
+
+.btn-sec {
+    text-align: center;
+    background-color: rgba(156, 246, 153, 0.8);
+    border-color: rgb(93, 138, 92);
+    border-style: solid;
+    border-radius: 10px;
+    border-width: 5px;
+    font-family: "Helvetica";
+    font-size: 16pt;
+    color: rgb(27, 35, 89);
+    overflow: hidden;
+    display: table;
+}
+
+.btn-main:hover {
+    background-color: rgba(156, 153, 246, 0.8);
+    border-color: rgb(124, 92, 138);
+    cursor: pointer;
+}
