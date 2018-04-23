@@ -2,7 +2,12 @@ var express = require('express');
 var session = require("express-session");
 var path = require("path");
 var bodyParser = require("body-parser");
+var mongo = require("mongodb");
+var mongoClient = require("mongodb").MongoClient;
 var app = express();
+
+const mongoUri = "mongodb://geo_dev:geo_dev@ds039674.mlab.com:39674/cis450_geoquiz";
+const dbName = "cis450_geoquiz";
 
 app.set('port', (process.env.PORT || 8888));
 app.use(express.static(__dirname + '/public'));
@@ -17,6 +22,16 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 function generateNextQuestion() {
+    mongoClient.connect(mongoUri, function(err, client){
+        var db = client.db(dbName);
+        var countryInfo = db.collection("all");
+        
+        // Do any appropriate querying here
+        
+        client.close();
+        
+    });
+    
     // This is a placeholder question
     // Replace it with a new question based off our template questions
     var nextQuestion = {
