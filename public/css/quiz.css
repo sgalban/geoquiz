@@ -44,7 +44,7 @@ html, body {
     margin: 0;
     padding: 0;
     animation: timer-shrink;
-    animation-duration: 10s;
+    animation-duration: 90s;
     animation-timing-function: linear;
 }
 

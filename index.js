@@ -8,6 +8,7 @@ var app = express();
 
 const mongoUri = "mongodb://geo_dev:geo_dev@ds039674.mlab.com:39674/cis450_geoquiz";
 const dbName = "cis450_geoquiz";
+var countries = [];
 
 app.set('port', (process.env.PORT || 8888));
 app.use(express.static(__dirname + '/public'));
@@ -21,31 +22,56 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-function generateNextQuestion() {
-    mongoClient.connect(mongoUri, function(err, client){
+/* Get all the countries */
+app.listen(app.get('port'), function() {
+  console.log("Node app is running at localhost:" + app.get('port'));
+  mongoClient.connect(mongoUri, function(err, client){
         var db = client.db(dbName);
-        var countryInfo = db.collection("all");
-        
-        // Do any appropriate querying here
-        
-        client.close();
-        
+        db.collection("all").find({}).project({Code: 1, Government: 1, _id: 0}).toArray(function(err, res) {
+            if(err) {
+                throw err;
+            }
+            var i;
+            for(i = 0; i < res.length; i++) {
+                var entry = {
+                    Code:  res[i].Code,
+                    Name:  res[i].Government["Country name"]["conventional short form"].text
+                }
+                countries.push(entry);
+            }
+            client.close();
+        });
     });
-    
-    // This is a placeholder question
-    // Replace it with a new question based off our template questions
-    var nextQuestion = {
-            text: "This is a placeholder question",
-            answers: [
-                "Answer 0",
-                "Answer 1",
-                "Answer 2",
-                "Answer 3"
-            ],
-            correct: 2
-    };
-    
-    return nextQuestion
+});
+
+function randomIntRange(min, max) {
+    return Math.floor(Math.random() * (max - min) ) + min;
+}
+
+function randomInt(max) {
+    return randomIntRange(0, max);
+}
+
+function getRandomCountry() {
+    return countries[randomInt(countries.length)];
+}
+
+function getFourRandomCountries() {
+    var arr = [];
+    while(arr.length < 4) {
+        var rand = randomInt(countries.length);
+        if(arr.indexOf(rand) > -1) {
+            continue;
+        }
+        else {
+            arr.push(rand);
+        }
+    }
+    return [countries[arr[0]], countries[arr[1]], countries[arr[2]], countries[arr[3]]];
+}
+
+function addCommas(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 /* Get the main page html */
@@ -55,19 +81,19 @@ app.get('/', function(req, res) {
 
 /* Get the quiz page html */
 app.get('/quiz', function(req, res) {
-  res.sendFile(path.join(__dirname, "/", "quiz.html"));
-  req.session.ready = true;
-  req.session.score = 0;
-  req.session.finished = false;
-  req.session.submitted = true;
-  req.session.save(function(err){});
-  setTimeout(function() {
-    req.session.reload(function(err){
-        req.session.finished = true;
-        req.session.submitted = false;
-        req.session.save(function(err){});
-    });
-  }, 1000 * 10);
+    res.sendFile(path.join(__dirname, "/", "quiz.html"));
+    req.session.ready = true;
+    req.session.score = 0;
+    req.session.finished = false;
+    req.session.submitted = true;
+    req.session.save(function(err){});
+    setTimeout(function() {
+        req.session.reload(function(err){
+            req.session.finished = true;
+            req.session.submitted = false;
+            req.session.save(function(err){});
+        });
+    }, 1000 * 90);
 });
 
 /* Get the score submission page html */
@@ -77,26 +103,6 @@ app.get('/submission', function (req, res) {
     }
     else {
         res.sendFile(path.join(__dirname, "/", "main.html"));
-    }
-});
-
-/* Create a question, as well as 4 sample answers. Do not send
-   the correct answer in the response. The order of the answers
-   should not indicate which one is correct */
-app.get('/generate-question', function(req, res) {
-    if(req.session.ready && ! req.session.finished) {
-        req.session.ready = false;
-                
-        req.session.curQues = generateNextQuestion();
-    
-        var questionInfo = {
-            text: req.session.curQues.text,
-            answers: req.session.curQues.answers
-        };
-        res.send(questionInfo);
-    }
-    else {
-        res.send("Not Ready");
     }
 });
 
@@ -145,6 +151,86 @@ app.post("/submit-score", function(req, res) {
     
 });
 
-app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'))
+// What is the population of <country>?
+function q1(countryInfo, client, req, res) {
+    var country = getRandomCountry();
+    countryInfo.findOne({Code: country.Code}, function(err, result) {
+        if (err) {
+            throw err;
+        }
+        var popString = result["People and Society"].Population.text;
+        popString = popString.replace(/,/g, "");
+        var index = popString.indexOf(" ");
+        if(index > 0){
+            popString = popString.substring(0, index);
+        }
+        var pop = parseInt(popString);
+        var order = Math.floor(randomInt(4));
+        var multipliers = [
+            randomIntRange(2, 5), 
+            randomIntRange(2, 5),
+            randomIntRange(2, 5),
+            randomIntRange(2, 5)
+        ];
+        var i;
+        var answers = [];
+        for(i = 0; i < 4; i++) {
+            var num = Math.floor(pop * Math.pow(multipliers[i], i - order))
+            answers[i] = addCommas(num);
+        }
+        
+        req.session.curQues = {
+            text: "What is the population of " + country.Name + "?",
+            answers: answers,
+            correct: order
+        }
+        req.session.save(function(err){});
+        var questionInfo = {
+            text: req.session.curQues.text,
+            answers: req.session.curQues.answers
+        };
+        res.send(questionInfo);
+        
+    });
+}
+
+function generateNextQuestion(req) {
+   
+    
+    /*
+    // This is a placeholder question
+    // Replace it with a new question based off our template questions
+    var nextQuestion = {
+            text: "This is a placeholder question",
+            answers: [
+                "Answer 0",
+                "Answer 1",
+                "Answer 2",
+                "Answer 3"
+            ],
+            correct: 2
+    };*/
+}
+
+/* Create a question, as well as 4 sample answers. Do not send
+   the correct answer in the response. The order of the answers
+   should not indicate which one is correct */
+app.get('/generate-question', function(req, res) {
+    if(req.session.ready && ! req.session.finished) {
+        req.session.ready = false;
+        
+        var nextQuestion = {};
+        mongoClient.connect(mongoUri, function(err, client){
+            var db = client.db(dbName);
+            var countryInfo = db.collection("all");
+
+            var questions = [q1];
+            var questionType = questions[randomInt(questions.length)];
+            nextQuestion = questionType(countryInfo, client, req, res);        
+        });
+    }
+    else {
+        res.send("Not Ready");
+    }
 });
+
