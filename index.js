@@ -278,6 +278,43 @@ function q3(countryInfo, client, req, res) {
     });
 }
 
+// Which of these countries is the largest by area?
+function q4(countryInfo, client, req, res) {
+    var countries = getFourRandomCountries();
+    var codes = [countries[0].Code, countries[1].Code, countries[2].Code, countries[3].Code];
+    countryInfo.find({Code: {$in: codes}}).project({_id:0, Code:1, Geography:1, Government:1})
+    .toArray(function(err, result) {
+        if (err) {
+            throw err;
+        }
+        var correct = 0;
+        var areas = [];
+        var answers = [];
+        var i;
+        for(i = 0; i < result.length; i++) {
+            areas[i] = result[i].Geography.Area.total.text;
+        }
+        for (i = 0; i < areas.length; i++) {
+            if(areas[i] > areas[correct]) {
+                correct = i;
+            }
+            answers[i] = result[i].Government["Country name"]["conventional short form"].text;
+        }
+        
+        req.session.curQues = {
+            text: "Which of these countries is the largest by area?",
+            answers: answers,
+            correct: correct
+        }
+        req.session.save(function(err){});
+        var questionInfo = {
+            text: req.session.curQues.text,
+            answers: req.session.curQues.answers
+        };
+        res.send(questionInfo);
+        
+    });
+}
 
 /* Create a question, as well as 4 sample answers. Do not send
    the correct answer in the response. The order of the answers
@@ -291,9 +328,9 @@ app.get('/generate-question', function(req, res) {
             var db = client.db(dbName);
             var countryInfo = db.collection("all");
 
-            var questions = [q1, q2, q3];
+            var questions = [q1, q2, q3, q4];
             var questionType = questions[randomInt(questions.length)];
-            //questionType = questions[2]; // Override. Comment out to cancel
+            //questionType = questions[3]; // Override. Comment out to cancel
             nextQuestion = questionType(countryInfo, client, req, res);        
         });
     }
