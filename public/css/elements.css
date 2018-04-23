@@ -7,8 +7,8 @@
 }
 
 .text-field {
-    background-color: rgba(125, 125, 125, 0.7);
-    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
     font-family: "Helvetica";
     font-size: 20pt;
 }
@@ -18,7 +18,8 @@
     background-color: rgba(126, 216, 123, 0.8);
     border-color: rgb(63, 108, 62);
     border-style: solid;
-    border-radius: 15px;
+    border-radius: 10px;
+    border-width: 5px;
     font-family: "Helvetica";
     font-size: 16pt;
     color: rgb(27, 35, 89);

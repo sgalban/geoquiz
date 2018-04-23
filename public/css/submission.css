@@ -5,9 +5,43 @@ html, body {
     width: 100vw;
 }
 
+body {
+    background-image: url(../img/earthBG.jpg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+}
+
 #submission-form {
     position: absolute;
     width: 100%;
-    top: 30%;
+    height: 50%;
+    top: 15%;
     text-align: center;
+    font-family: "Helvetica";
+    font-size: 26pt;
+}
+
+#submission-form > form {
+    text-align: center;
+}
+
+form > span {
+    color: rgb(32, 32, 32);
+    font-weight: bold;
+}
+
+#name-field {
+    width: 70%;
+    height: 20%;
+    color: rgba(200, 200, 200, 0.7);
+    font-weight: bold;
+    padding-left: 2%;
+}
+
+#submit-button {
+    width: 60%;
+    height: 20%;
+    margin-left: 20%;
 }
