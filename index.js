@@ -264,7 +264,7 @@ function q3(countryInfo, client, req, res) {
         var country = result[correct].Government["Country name"]["conventional short form"].text;
         
         req.session.curQues = {
-            text: "What is the capital of " + country,
+            text: "What is the capital of " + country + "?",
             answers: answers,
             correct: correct
         }
