@@ -201,7 +201,7 @@ function q1(countryInfo, client, req, res) {
             answers: req.session.curQues.answers
         };
         res.send(questionInfo);
-        
+        client.close();
     });
 }
 
@@ -237,7 +237,7 @@ function q2(countryInfo, client, req, res) {
             answers: req.session.curQues.answers
         };
         res.send(questionInfo);
-        
+        client.close();
     });
 }
 
@@ -274,7 +274,7 @@ function q3(countryInfo, client, req, res) {
             answers: req.session.curQues.answers
         };
         res.send(questionInfo);
-        
+        client.close();
     });
 }
 
@@ -312,7 +312,7 @@ function q4(countryInfo, client, req, res) {
             answers: req.session.curQues.answers
         };
         res.send(questionInfo);
-        
+        client.close();
     });
 }
 
@@ -350,8 +350,32 @@ function q5(countryInfo, client, req, res) {
             answers: req.session.curQues.answers
         };
         res.send(questionInfo);
-        
+        client.close();
     });
+}
+
+// <Flat> is the flag of which country?
+function q6(countryInfo, client, req, res) {
+    var countries = getFourRandomCountries();
+    var answers = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
+    var correct = randomInt(4);
+    var flagRef = "https://www.cia.gov/library/publications/the-world-factbook/graphics/flags/large/" +
+                  countries[correct].Code +
+                  "-lgflag.gif"
+    req.session.curQues = {
+        text: "This is the flag of which country?",
+        answers: answers,
+        correct: correct
+    }
+    req.session.save(function(err){});
+    var questionInfo = {
+        text: req.session.curQues.text,
+        answers: req.session.curQues.answers,
+        imageRef: flagRef
+    };
+    res.send(questionInfo);
+    client.close();
+    
 }
 
 /* Create a question, as well as 4 sample answers. Do not send
@@ -366,9 +390,9 @@ app.get('/generate-question', function(req, res) {
             var db = client.db(dbName);
             var countryInfo = db.collection("all");
 
-            var questions = [q1, q2, q3, q4, q5];
+            var questions = [q1, q2, q3, q4, q5, q6];
             var questionType = questions[randomInt(questions.length)];
-            //questionType = questions[3]; // Override. Comment out to cancel
+            //questionType = questions[5]; // Override. Comment out to cancel
             nextQuestion = questionType(countryInfo, client, req, res);        
         });
     }

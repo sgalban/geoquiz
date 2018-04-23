@@ -32,6 +32,19 @@ app.controller("questionController", function($scope, $http, $window) {
             }
             else {
                 $scope.questionData = data;
+                if(data.imageRef) {
+                    $("#question-image").attr("src", data.imageRef);
+                    $("#question-image").css({
+                        "width": "10%",
+                        "border-style": "solid" 
+                    });
+                }
+                else{
+                    $("#question-image").css({
+                        "width": "0%",
+                        "border-style": "none" 
+                    });
+                }
             }
         });
         req.error(function(data) {

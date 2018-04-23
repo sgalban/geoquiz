@@ -87,6 +87,12 @@ html, body {
     top: 20%;
 }
 
+#question-image {
+    display: inline-block;
+    width: 10%;
+    border-style: solid
+}
+
 #answers {
     position: absolute;
     width: 70%;
