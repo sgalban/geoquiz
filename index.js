@@ -71,7 +71,18 @@ function getFourRandomCountries() {
 }
 
 function addCommas(num) {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function firstNonLetter(str) {
+    var i;
+    for(i = 0; i < str.length; i++){
+        var c = str.charAt(i).toUpperCase();
+        if(c != " " && (c < "A" || c > "Z")) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 /* Get the main page html */
@@ -194,23 +205,42 @@ function q1(countryInfo, client, req, res) {
     });
 }
 
-function generateNextQuestion(req) {
-   
-    
-    /*
-    // This is a placeholder question
-    // Replace it with a new question based off our template questions
-    var nextQuestion = {
-            text: "This is a placeholder question",
-            answers: [
-                "Answer 0",
-                "Answer 1",
-                "Answer 2",
-                "Answer 3"
-            ],
-            correct: 2
-    };*/
+// <Capital> is the capital of which country?
+function q2(countryInfo, client, req, res) {
+    var countries = getFourRandomCountries();
+    var codes = [countries[0].Code, countries[1].Code, countries[2].Code, countries[3].Code];
+    countryInfo.find({Code: {$in: codes}}).project({_id:0, Code:1, Government:1})
+    .toArray(function(err, result) {
+        if (err) {
+            throw err;
+        }
+        var answers = [];
+        var i;
+        for(i = 0; i < 4; i++) {
+            answers[i] = result[i].Government["Country name"]["conventional short form"].text;
+        }
+        var correct = randomInt(4);
+        var capital = result[correct].Government.Capital.name.text;
+        var index = firstNonLetter(capital);
+        if(index > 0) {
+            capital = capital.substring(0, index).trim();
+        }
+        
+        req.session.curQues = {
+            text: capital + " is the capital of which country?",
+            answers: answers,
+            correct: correct
+        }
+        req.session.save(function(err){});
+        var questionInfo = {
+            text: req.session.curQues.text,
+            answers: req.session.curQues.answers
+        };
+        res.send(questionInfo);
+        
+    });
 }
+
 
 /* Create a question, as well as 4 sample answers. Do not send
    the correct answer in the response. The order of the answers
@@ -224,8 +254,9 @@ app.get('/generate-question', function(req, res) {
             var db = client.db(dbName);
             var countryInfo = db.collection("all");
 
-            var questions = [q1];
+            var questions = [q1, q2];
             var questionType = questions[randomInt(questions.length)];
+            //questionType = questions[1]; // Override. Comment out to cancel
             nextQuestion = questionType(countryInfo, client, req, res);        
         });
     }
