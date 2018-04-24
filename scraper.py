@@ -3,10 +3,6 @@ import requests
 import os, os.path, csv
 import json
 
-listingurl = "http://www.espn.com/college-sports/football/recruiting/databaseresults/_/sportid/24/class/2006/sort/school/starsfilter/GT/ratingfilter/GT/statuscommit/Commitments/statusuncommit/Uncommited"
-response = requests.get(listingurl)
-soup = BeautifulSoup(response.text, "html.parser")
-
 def parse_cities():
 	count = 0
 	link = 'https://en.wikipedia.org/wiki/List_of_largest_cities'
@@ -26,7 +22,6 @@ def parse_cities():
 
 	with open('city_result.json', 'w') as fp:
 		json.dump(city_dictionary, fp)
-
 
 
 def main():
