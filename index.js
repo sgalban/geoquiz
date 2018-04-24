@@ -23,10 +23,32 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+
+// Connect to the database. Don't forget to close the connection
+function dbConnect() {
+    var connection = mysql.createConnection({
+        host        : "geoquizid.cglhz5b6lacy.us-east-2.rds.amazonaws.com",
+        user        : "geoquiz_user",
+        password    : "geopassword",
+        database    : "geoquiz",
+        port        : 3306
+    });
+    connection.connect(function(error) {
+        if(error){
+            console.log("Error connecting to database");    
+            throw error;
+        }
+        else{
+            console.log("Successfully connected to database");
+        }
+    });
+    return connection;
+}
+
 /* Get all the countries */
 app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'));
-  mongoClient.connect(mongoUri, function(err, client){
+    console.log("Node app is running at localhost:" + app.get('port'));
+    mongoClient.connect(mongoUri, function(err, client){
         var db = client.db(dbName);
         db.collection("all").find({}).project({Code: 1, Government: 1, _id: 0}).toArray(function(err, res) {
             if(err) {
