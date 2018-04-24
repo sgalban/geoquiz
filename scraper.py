@@ -14,10 +14,12 @@ def parse_cities():
 		if city:
 			attributes = [el.text.encode('utf-8') for el in rows.find_all('td')]
 			country = attributes[0].split('\xc2\xa0')[1]
+			print(country)
+
 			population = attributes[2].split('[')[0]
 			city_dictionary[city.text.encode('utf-8').strip()] = {'country':country.strip(), 'population':population.strip()}
 			count += 1
-		if count == 242:
+		if count == 241:
 			break
 
 	with open('city_result.json', 'w') as fp:
@@ -68,8 +70,8 @@ def parse_mountains():
 
 
 def main():
-	#parse_cities()
-	parse_mountains()
+	parse_cities()
+	#parse_mountains()
 
 if __name__ == '__main__':
 	main()
