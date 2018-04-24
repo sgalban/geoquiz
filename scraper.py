@@ -19,7 +19,7 @@ def parse_cities():
 			attributes = [el.text.encode('utf-8') for el in rows.find_all('td')]
 			country = attributes[0].split('\xc2\xa0')[1]
 			population = attributes[2].split('[')[0]
-			city_dictionary[city.text.encode('utf-8').rstrip()] = {'country':country.rstrip(), 'population':population}
+			city_dictionary[city.text.encode('utf-8').rstrip()] = {'country':country.rstrip(), 'population':population.rstrip()}
 			count += 1
 		if count == 242:
 			break
