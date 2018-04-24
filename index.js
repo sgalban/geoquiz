@@ -4,6 +4,7 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var mongo = require("mongodb");
 var mongoClient = require("mongodb").MongoClient;
+var mysql = require("mysql");
 var app = express();
 
 const mongoUri = "mongodb://geo_dev:geo_dev@ds039674.mlab.com:39674/cis450_geoquiz";
@@ -354,7 +355,7 @@ function q5(countryInfo, client, req, res) {
     });
 }
 
-// <Flat> is the flag of which country?
+// <Flag> is the flag of which country?
 function q6(countryInfo, client, req, res) {
     var countries = getFourRandomCountries();
     var answers = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
