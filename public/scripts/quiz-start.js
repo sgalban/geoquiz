@@ -12,7 +12,7 @@ app.controller("questionController", function($scope, $http, $window) {
         }, 1000 * 2);
     }
 
-    setTimeout(endGame, 1000 * 90);
+    setTimeout(endGame, 1000 * 10);
 
     var newQuestion = function() {
     

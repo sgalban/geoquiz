@@ -86,7 +86,7 @@ app.get('/quiz', function(req, res) {
     res.sendFile(path.join(__dirname, "/", "quiz.html"));
     req.session.score = 0;
     req.session.finished = false;
-    req.session.submitted = true;
+    req.session.submitted = false;
     req.session.curQues = {};
     req.session.nextQues = {};
     req.session.save(function(err){});
@@ -96,7 +96,7 @@ app.get('/quiz', function(req, res) {
             req.session.submitted = false;
             req.session.save(function(err){});
         });
-    }, 1000 * 90);
+    }, 1000 * 10);
 });
 
 /* Get the score submission page html */
@@ -107,6 +107,11 @@ app.get('/submission', function (req, res) {
     else {
         res.sendFile(path.join(__dirname, "/", "main.html"));
     }
+});
+
+/* Get the scoreboard page html */
+app.get('/scoreboard', function (req, res) {
+    res.sendFile(path.join(__dirname, "/", "scoreboard.html"));
 });
 
 /* Verify that the selected answer is correct */
@@ -137,13 +142,30 @@ app.get("/retrieve-score", function(req, res) {
 
 /* Submit the user's most recent score to the database */
 app.post("/submit-score", function(req, res) {
-    req.session.username = req.body.username; // Should probably sanitize
+    req.session.username = req.body.username;
     if (req.session.submitted) {
         res.send("Cannot submit again");
     }
     else {
-        // This is where we update the db
-        res.sendFile(path.join(__dirname, "/", "main.html")); // Make a new page later
+        req.session.submitted = true;
+        if(req.session.score) {
+            mongoClient.connect(mongoUri, function(err, client){
+                var db = client.db(dbName);
+                db.collection("scores").insertOne({
+                    playerID:   req.session.id,
+                    name:       req.session.username,
+                    score:      req.session.score,
+                    time:       Date.now()
+                }, function(error, result) {
+                    if(error) {
+                        throw error;
+                    }
+                    client.close();
+                });
+            });
+        }
+    
+        res.sendFile(path.join(__dirname, "/", "main.html"));
     }
     
 });
@@ -498,7 +520,6 @@ function q11(req, res) {
         " UNION " +
         "(SELECT code, name, continent FROM Countries WHERE continent != '" + con + "'" + 
         " ORDER BY RAND() LIMIT 3)";
-    console.log(query);
     pool.getConnection(function(err, connection) {
         if(err) {
             throw err;
@@ -508,7 +529,6 @@ function q11(req, res) {
             for(var i = 0; i < 4; i++){
                 r[i] = results[i];
             }
-            console.log(r);
             connection.release();
             shuffle(r);
             correct = 0;
@@ -622,7 +642,6 @@ function q14(req, res) {
                 r[i] = results[i];
             }
             connection.release();
-            console.log(r);
             shuffle(r);
             correct = 0;
             for(var i = 0; i < r.length; i++) {
@@ -661,7 +680,6 @@ function q14(req, res) {
                 r[i] = results[i];
             }
             connection.release();
-            console.log(r);
             shuffle(r);
             correct = 0;
             for(var i = 0; i < r.length; i++) {
