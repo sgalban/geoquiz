@@ -159,7 +159,7 @@ VALUES("eg","Egypt",94666993,"Cairo",1001450,1105000000000,"Africa");
 INSERT INTO Countries
 VALUES("ec","Ecuador",16080778,"Quito",283561,182400000000,"South America");
 INSERT INTO Countries
-VALUES("dr","The Dominican",10606865,"Santo Domingo",48670,160900000000,"South America");
+VALUES("dr","Dominican Republic",10606865,"Santo Domingo",48670,160900000000,"South America");
 INSERT INTO Countries
 VALUES("cs","Costa Rica",4872543,"San Jose",51100,79260000000,"South America");
 INSERT INTO Countries
