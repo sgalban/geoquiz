@@ -23,8 +23,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-
-// Connect to the database. Don't forget to close the connection
 function dbConnect() {
     var connection = mysql.createConnection({
         host        : "geoquizid.cglhz5b6lacy.us-east-2.rds.amazonaws.com",
@@ -47,8 +45,8 @@ function dbConnect() {
 
 /* Get all the countries */
 app.listen(app.get('port'), function() {
-    console.log("Node app is running at localhost:" + app.get('port'));
-    mongoClient.connect(mongoUri, function(err, client){
+  console.log("Node app is running at localhost:" + app.get('port'));
+  mongoClient.connect(mongoUri, function(err, client){
         var db = client.db(dbName);
         db.collection("all").find({}).project({Code: 1, Government: 1, _id: 0}).toArray(function(err, res) {
             if(err) {
@@ -80,17 +78,48 @@ function getRandomCountry() {
 }
 
 function getFourRandomCountries() {
-    var arr = [];
-    while(arr.length < 4) {
-        var rand = randomInt(countries.length);
-        if(arr.indexOf(rand) > -1) {
-            continue;
-        }
-        else {
-            arr.push(rand);
-        }
-    }
-    return [countries[arr[0]], countries[arr[1]], countries[arr[2]], countries[arr[3]]];
+	var con = dbConnect();
+    con.connect(function(err) {
+		if(err) throw err;
+		var countries = [];
+		con.query("SELECT name FROM Countries ORDER BY RAND() LIMIT 4", function(err, results, fields) {
+			if (err) throw err;
+			for (i = 0; i < results.length; i++) {
+				countries.push(results[i].name);
+			}
+			return countries;
+		})
+	})
+}
+
+function getFourRandomCities() {
+	var con = dbConnect();
+    con.connect(function(err) {
+		if(err) throw err;
+		var cities = [];
+		con.query("SELECT name FROM Cities ORDER BY RAND() LIMIT 4", function(err, results, fields) {
+			if (err) throw err;
+			for (i = 0; i < results.length; i++) {
+				cities.push(results[i].name);
+			}
+			return cities;
+		})
+	})
+}
+
+function getFourRandomMtns() {
+	var con = dbConnect();
+    con.connect(function(err) {
+		if(err) throw err;
+		var mtns = [];
+		con.query("SELECT name FROM Mountains ORDER BY RAND() LIMIT 4", function(err, results, fields) {
+			if (err) throw err;
+			for (i = 0; i < results.length; i++) {
+				mtns.push(results[i].name);
+			}
+			return mtns;
+		})
+	})
 }
 
 function addCommas(num) {
@@ -401,6 +430,371 @@ function q6(countryInfo, client, req, res) {
     
 }
 
+
+
+// Which of these countries is largest by gdp?
+function q7(req, res) {
+	var con = dbConnect();
+	var countries = getFourRandomCountries();
+    var names = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
+	var gdps = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, gdp FROM Countries WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				gdps[i] = results[i].gdp;
+ 			}
+			for (i = 0; i < gdps.length; i++) {
+				if (gdps[i] > gdps[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these countries has the largest GDP?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+		})
+	})
+	
+}
+
+// Which of these countries is smallest by gdp?
+function q8(req, res) {
+	var con = dbConnect();
+	var countries = getFourRandomCountries();
+    var names = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
+	var gdps = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, gdp FROM Countries WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				gdps[i] = results[i].gdp;
+ 			}
+			for (i = 0; i < gdps.length; i++) {
+				if (gdps[i] <  gdps[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these countries has the smallest GDP?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+		})
+	})
+	
+}
+
+// Which of these countries is largest in population?
+function q9(req, res) {
+	var con = dbConnect();
+	var countries = getFourRandomCountries();
+    var names = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
+	var pops = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, population FROM Countries WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				pops[i] = results[i].population;
+ 			}
+			for (i = 0; i < pops.length; i++) {
+				if (pops[i] > pops[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these countries has the largest population?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+		})
+	})
+	
+}
+
+// Which of these countries is smallest in population?
+function q10(req, res) {
+	var con = dbConnect();
+	var countries = getFourRandomCountries();
+    var names = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
+	var pops = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, population FROM Countries WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				pops[i] = results[i].population;
+ 			}
+			for (i = 0; i < pops.length; i++) {
+				if (pops[i] <  pops[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these countries has the smallest population?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+		})
+	})
+	
+}
+
+// Which of these countries is from <Continent>?
+function q11(req, res) {
+	var con = dbConnect();
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, continent FROM Countries", function(err, results, fields) {
+			if (err) throw err;
+			var continents = [];
+			var answers = [];
+			var ctr = 0;
+			while (ctr < 4) {
+				var random = randomInt(results.length);
+				if (continents.indexOf(results[random].continent) == -1) {
+					continents.push(results[random].continent);
+					answers.push(results[random].name);
+					ctr++;
+				}
+			}
+			var correct = randomInt(4);
+			req.session.curQues = {
+            text: "Which of these countries is in " + continents[correct] + " ?",
+            	answers: answers,
+            	correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);			
+		})
+	})
+}
+
+//Which of these continents is <Country> in?
+function q12(req, res) {
+	var con = dbConnect();
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, continent FROM Countries", function(err, results, fields) {
+			if (err) throw err;
+			var counts = [];
+			var answers = [];
+			var ctr = 0;
+			while (ctr < 4) {
+				var random = randomInt(results.length);
+				if (answers.indexOf(results[random].continent) == -1) {
+					answers.push(results[random].continent);
+					counts.push(results[random].name);
+					ctr++;
+				}
+			}
+			var correct = randomInt(4);
+			req.session.curQues = {
+            text: "Which of these continents is " + counts[correct] + " in?",
+            	answers: answers,
+            	correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);			
+		})
+	})
+}
+
+//Which of these cities has the largest population?
+function q13(req, res) {
+	var con = dbConnect();
+	var cities = getFourRandomCities();
+	var names = [cities[0].name, cities[1].name, cities[2].name, cities[3].name];
+	var pops = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, population FROM Cities WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				pops[i] = results[i].population;
+ 			}
+			for (i = 0; i < pops.length; i++) {
+				if (pops[i] >  pops[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these cities has the largest population?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+        	client.close();
+		})
+	})
+}
+
+//Which of these cities has the smallest population?
+function q14(req, res) {
+	var con = dbConnect();
+	var cities = getFourRandomCities();
+	var names = [cities[0].name, cities[1].name, cities[2].name, cities[3].name];
+	var pops = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, population FROM Cities WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				pops[i] = results[i].population;
+ 			}
+			for (i = 0; i < pops.length; i++) {
+				if (pops[i] <  pops[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these cities has the smallest population?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+        	client.close();
+		})
+	})
+}
+
+//Which of these mountains has the greatest elevation?
+function q15(req, res) {
+	var con = dbConnect();
+	var mtns = getFourRandomMtns();
+	var names = [mtns[0].name, mtns[1].name, mtns[2].name, mtns[3].name];
+	var elevs = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, elevation FROM Mountains WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				elevs[i] = results[i].elevation;
+ 			}
+			for (i = 0; i < elevs.length; i++) {
+				if (elevs[i] >  elevs[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these mountains has the greatest elevation?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+        	client.close();
+		})
+	})
+}
+
+//Which of these mountains has the smallest elevation?
+function q16(req, res) {
+	var con = dbConnect();
+	var mtns = getFourRandomMtns();
+	var names = [mtns[0].name, mtns[1].name, mtns[2].name, mtns[3].name];
+	var elevs = [];
+	var answers = [];
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query("SELECT name, elevation FROM Mountains WHERE name IN names", function(err, results, fields) {
+			if (err) throw err;
+			var correct = 0;
+        	for (i = 0; i < results.length; i++) {
+				elevs[i] = results[i].elevation;
+ 			}
+			for (i = 0; i < elevs.length; i++) {
+				if (elevs[i] <  elevs[correct]) {
+					correct = i;
+				}
+				answers[i] = results[i].name;
+			}
+			req.session.curQues = {
+            text: "Which of these mountains has the smallest elevation?",
+            answers: answers,
+            correct: correct
+        	}
+        	req.session.save(function(err){});
+        	var questionInfo = {
+            	text: req.session.curQues.text,
+            	answers: req.session.curQues.answers
+        	};
+        	res.send(questionInfo);
+        	client.close();
+		})
+	})
+}
 /* Create a question, as well as 4 sample answers. Do not send
    the correct answer in the response. The order of the answers
    should not indicate which one is correct */
