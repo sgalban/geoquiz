@@ -944,6 +944,52 @@ function q20(req, res) {
     });
 }
 
+// How many common religions does <country> have?
+function q21(req, res) {
+	var query = 
+	    "SELECT * FROM " + 
+        "(SELECT Countries.name AS country, COUNT(religion) AS count FROM " +
+        "(Religions JOIN Countries ON Religions.countryCode = Countries.code) " +
+        "GROUP BY (country)) T " +
+        " ORDER BY RAND() LIMIT 1;"
+                                   
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            
+            if(error) {
+                throw error;
+            }
+            var correctAnswer = results[0]["count"];
+            var country = results[0]["country"];
+            connection.release();
+            
+            var answers = [];
+            if(correctAnswer <= 4) {
+                answers = [1, 2, 3, 4];
+            }
+            else {
+                answers[0] = correctAnswer;
+                answers[1] = Math.random() > 0.5 ? correctAnswer + 1 : correctAnswer - 1;
+                answers[2] = Math.random() > 0.5 ? correctAnswer + 2 : correctAnswer - 2;
+                answers[3] = Math.random() > 0.5 ? correctAnswer + 3 : correctAnswer - 3;
+            }
+            shuffle(answers);
+            correct = 0;
+            for(var i = 0; i < 4; i++){
+                if(answers[i] == correctAnswer) {
+                    correct = i;
+                }
+            }
+            
+            var question = "How many major religions are practiced in " + country +"?";
+            setNextQuestion(req, res, question, answers, correct, 30);     
+        });
+    });
+}
+
 
 
 /* Create a question, as well as 4 sample answers. Do not send
@@ -954,10 +1000,10 @@ app.get('/generate-question', function(req, res) {
         
         var questions = [
             q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13,
-            q14, q15, q16, q17, q18, q19, q20
+            q14, q15, q16, q17, q18, q19, q20, q21
         ];
         var questionType = questions[randomInt(questions.length)];
-        //questionType = questions[19]; // Override. Comment out to cancel
+        //questionType = questions[20]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
