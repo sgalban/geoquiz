@@ -8,7 +8,7 @@ def parse_cities():
 	data = json.load(open('db_files/all.json'))
 	code_dict = {}
 
-	for i in range(94):
+	for i in range(114):
 		code = data[i]["Code"]
 		name = data[i]["Government"]["Country name"]["conventional short form"]["text"]
 		code_dict[name] = code
@@ -26,20 +26,16 @@ def parse_cities():
 			population = population.replace(',', '').strip()
 			if country == 'Korea, South':
 				country = 'South Korea'
-			#if country == 'Korea, North':
-			#	country = 'North Korea'
+			elif country == '':
+				continue
 			count += 1
 			city_text = city.text.encode('utf-8').strip()
 			if city_text == "Xi'an":
 				continue
-			unavail_countries = ['DR Congo', 'Myanmar', 'Ivory Coast', 'Afghanistan', 'Korea, North', 'United Arab Emirates', 'Nicaragua', 'Cambodia', 'Burkina Faso', 'Cuba', 'Yemen', 'Congo Republic', 'Mozambique', 'Zambia', '', 'Zimbabwe', 'Uganda', 'Czech Republic', 'Senegal', 
-			'Georgia', 'Armenia']
-			if country in unavail_countries:
-				continue
 			if population == ' 1029556':
 				population = population[1:]
 			city_dictionary[city_text] = {'country':code_dict[country.strip()], 'population':population}
-		if count == 241:
+		if count == 240:
 			break
 
 	with open('city_result.json', 'w') as fp:
