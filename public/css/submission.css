@@ -46,8 +46,9 @@ form > span {
     margin-left: 20%;
 }
 
-form > a {
+a {
     width: 60%;
     height: 20%;
     margin-left: 20%;
+    text-decoration: none;
 }

@@ -32,12 +32,13 @@ var pool = mysql.createPool({
 
 const continents = ["North America", "South America", "Asia", "Africa", "Europe"];
 
-function setNextQuestion(req, res, text, answers, correct, imgRef=undefined) {
+function setNextQuestion(req, res, text, answers, correct, points, imgRef=undefined) {
     req.session.curQues = req.session.nextQues;
     req.session.nextQues = {
         text: text,
         answers:    answers,
         correct:    correct,
+        points:     points,
         imageRef:   imgRef
     }
     req.session.save(function(err){});
@@ -116,7 +117,7 @@ app.get('/verify-answer', function(req, res) {
     else {
         var selectedAnswer = req.query.selected;
         if (selectedAnswer == req.session.curQues.correct) {
-            req.session.score += 20;
+            req.session.score += req.session.curQues.points;
             req.session.save(function(err){});
             res.send({newScore: req.session.score, correct: true});
         }
@@ -181,7 +182,7 @@ function q1(req, res) {
             connection.release();
             
             var question = "What is the population of "  + country + "?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 30);     
         });
     });
 }
@@ -206,7 +207,7 @@ function q2(req, res) {
             
             connection.release();
             var question = capital + " is the capital of which country?"
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 10);     
         });
     });
 }
@@ -232,7 +233,7 @@ function q3(req, res) {
             
             connection.release();
             var question = "What is the capital of " + country + "?"
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 10);     
         });
     });
 }
@@ -269,7 +270,7 @@ function q4(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these countries is the largest by area?"
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 15);     
         });
     });
 }
@@ -307,7 +308,7 @@ function q5(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these countries is the smallest by area?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 20);     
         });
     });
 }
@@ -332,7 +333,7 @@ function q6(req, res) {
                   "-lgflag.gif"
             connection.release();
             var question = "The following is the flag of which country?"
-            setNextQuestion(req, res, question, answers, correct, flagRef); 
+            setNextQuestion(req, res, question, answers, correct, 20, flagRef); 
         });    
     });    
 }
@@ -370,7 +371,7 @@ function q7(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these countries is the largest by gdp?"
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 25);     
         });
     });
 }
@@ -407,7 +408,7 @@ function q8(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these countries is the smallest by gdp?"
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 25);     
         });
     });
 }
@@ -445,7 +446,7 @@ function q9(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these countries has the largest population?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 20);     
         });
     });
 }
@@ -483,7 +484,7 @@ function q10(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these countries has the smallest population?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 20);     
         });
     });
 }
@@ -519,7 +520,7 @@ function q11(req, res) {
             var answers = [r[0]["name"], r[1]["name"], 
                            r[2]["name"], r[3]["name"]];
             var question = "The following countries is in " + con + "?";
-            setNextQuestion(req, res, question, answers, correct); 
+            setNextQuestion(req, res, question, answers, correct, 10); 
         });    
     }); 
 }
@@ -557,7 +558,7 @@ function q12(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these cities has the largest population?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 25);     
         });
     });
 }
@@ -595,7 +596,7 @@ function q13(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these cities has the smallest population?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 30);     
         });
     });
 }
@@ -634,7 +635,7 @@ function q14(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these mountains is the tallest?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 30);     
         });
     });
 }
@@ -673,7 +674,7 @@ function q14(req, res) {
                            r[2]["name"], r[3]["name"]];
             
             var question = "Which of these mountains is the shortest?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 30);     
         });
     });
 }
@@ -707,7 +708,7 @@ function q15(req, res) {
             connection.release();
             
             var question = "Which of these countries is " + mountain + " found in?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 20);     
         });
     });
 }
@@ -741,7 +742,7 @@ function q16(req, res) {
             connection.release();
             
             var question = "Which of these mountains is in " + country + "?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 20);     
         });
     });
 }
@@ -775,7 +776,7 @@ function q17(req, res) {
             connection.release();
             
             var question = "Which of these countries is " + city + " found in?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 15);     
         });
     });
 }
@@ -809,7 +810,7 @@ function q18(req, res) {
             connection.release();
             
             var question = "Which of these cities is in " + country + "?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 15);     
         });
     });
 }
@@ -864,7 +865,7 @@ function q19(req, res) {
             }
             
             var question = "What is the largest city in " + country + "?";
-            setNextQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct, 10);     
         });
     });
 }
@@ -880,7 +881,7 @@ app.get('/generate-question', function(req, res) {
             q14, q15, q16, q17, q18, q19
         ];
         var questionType = questions[randomInt(questions.length)];
-        questionType = questions[18]; // Override. Comment out to cancel
+        //questionType = questions[5]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
