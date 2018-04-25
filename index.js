@@ -35,17 +35,19 @@ function dbConnect() {
     // Remove
 }
 
-function setNextQuestion(req, res, text, answers, correct) {
+function setNextQuestion(req, res, text, answers, correct, imgRef=undefined) {
     req.session.curQues = req.session.nextQues;
     req.session.nextQues = {
         text: text,
-        answers: answers,
-        correct: correct
+        answers:    answers,
+        correct:    correct,
+        imageRef:   imgRef
     }
     req.session.save(function(err){});
     var questionInfo = {
         text: req.session.curQues.text,
-        answers: req.session.curQues.answers
+        answers: req.session.curQues.answers,
+        imageRef: req.session.curQues.imageRef,
     };
     
     res.send(questionInfo);
@@ -366,7 +368,7 @@ function q5(req, res) {
             var answers = [r[0]["name"], r[1]["name"], 
                            r[2]["name"], r[3]["name"]];
             
-            var question = "Which of these countries is the smallest by area?"
+            var question = "Which of these countries is the smallest by area?";
             setNextQuestion(req, res, question, answers, correct);     
         });
     });
@@ -374,27 +376,27 @@ function q5(req, res) {
 
 
 // <Flag> is the flag of which country?
-function q6(countryInfo, client, req, res) {
-    var countries = getFourRandomCountries();
-    var answers = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
-    var correct = randomInt(4);
-    var flagRef = "https://www.cia.gov/library/publications/the-world-factbook/graphics/flags/large/" +
-                  countries[correct].Code +
+function q6(req, res) {
+    var query = 
+        "SELECT code, name FROM Countries " + 
+        "ORDER BY RAND() LIMIT 4";
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+
+            var correct = randomInt(4);
+            var answers = [results[0]["name"], results[1]["name"], 
+                           results[2]["name"], results[3]["name"]];
+            var flagRef = "https://www.cia.gov/library/publications/the-world-factbook/graphics/flags/large/" +
+                  results[correct]["code"] +
                   "-lgflag.gif"
-    req.session.curQues = {
-        text: "This is the flag of which country?",
-        answers: answers,
-        correct: correct
-    }
-    req.session.save(function(err){});
-    var questionInfo = {
-        text: req.session.curQues.text,
-        answers: req.session.curQues.answers,
-        imageRef: flagRef
-    };
-    res.send(questionInfo);
-    client.close();
-    
+            connection.release();
+            var question = "The following is the flag of which country?"
+            setNextQuestion(req, res, question, answers, correct, flagRef); 
+        });    
+    });    
 }
 
 // Which of these countries is largest by gdp?
@@ -766,9 +768,9 @@ function q16(req, res) {
 app.get('/generate-question', function(req, res) {
     if(!req.session.finished) {
         
-        var questions = [q1, q2, q3, q4, q5];
+        var questions = [q1, q2, q3, q4, q5, q6];
         var questionType = questions[randomInt(questions.length)];
-        //questionType = questions[3]; // Override. Comment out to cancel
+        questionType = questions[5]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
