@@ -957,7 +957,7 @@ app.get('/generate-question', function(req, res) {
             q14, q15, q16, q17, q18, q19, q20
         ];
         var questionType = questions[randomInt(questions.length)];
-        questionType = questions[19]; // Override. Comment out to cancel
+        //questionType = questions[19]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
