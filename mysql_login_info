@@ -1,0 +1,5 @@
+Enter the following command:
+
+mysql -u geoquiz_user -h geoquizid.cglhz5b6lacy.us-east-2.rds.amazonaws.com -p geoquiz
+
+password: geopassword
