@@ -96,9 +96,11 @@ def parse_mountains():
 			elif 'Jongsong' in mountain[1].text:
 				country = 'China'
 
-			unavail_countries = ['Nepal', 'Bhutan', 'Tajikistan']
+			unavail_countries = ['Bhutan', 'Tajikistan']
 			if country in unavail_countries:
 				continue
+			elif country == 'Nepal':
+				code_dict[country] = 'np'
 		
 			peak = mountain[1].text.encode('utf-8', 'ignore').strip().split('/')[0].split('[')[0].strip()
 			elevation = mountain[3].text.encode('utf-8', 'ignore').strip()
