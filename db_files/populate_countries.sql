@@ -207,7 +207,7 @@ VALUES("np","Nepal",29033914,"Kathmandu",147181,71520,"Asia");
 INSERT INTO Countries
 VALUES("mz","Mozambique",25930150,"Maputo",799380,35310,"Africa");
 INSERT INTO Countries
-VALUES("kn","Korea, North",25115311,"Pyongyang",120538,40000,"Asia");
+VALUES("kn","North Korea",25115311,"Pyongyang",120538,40000,"Asia");
 INSERT INTO Countries
 VALUES("iv","Ivory Coast",23740424,"Yamoussoukro",322463,87120,"Africa");
 INSERT INTO Countries

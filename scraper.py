@@ -26,6 +26,8 @@ def parse_cities():
 			population = population.replace(',', '').strip()
 			if country == 'Korea, South':
 				country = 'South Korea'
+			elif country == 'Korea, North':
+				country = 'North Korea'
 			elif country == '':
 				continue
 			count += 1
