@@ -401,76 +401,76 @@ function q6(req, res) {
 
 // Which of these countries is largest by gdp?
 function q7(req, res) {
-	var con = dbConnect();
-	var countries = getFourRandomCountries();
-    var names = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
-	var gdps = [];
-	var answers = [];
-	con.connect(function(err) {
-		if (err) throw err;
-		con.query("SELECT name, gdp FROM Countries WHERE name IN names", function(err, results, fields) {
-			if (err) throw err;
-			var correct = 0;
-        	for (i = 0; i < results.length; i++) {
-				gdps[i] = results[i].gdp;
- 			}
-			for (i = 0; i < gdps.length; i++) {
-				if (gdps[i] > gdps[correct]) {
-					correct = i;
-				}
-				answers[i] = results[i].name;
-			}
-			req.session.curQues = {
-            text: "Which of these countries has the largest GDP?",
-            answers: answers,
-            correct: correct
-        	}
-        	req.session.save(function(err){});
-        	var questionInfo = {
-            	text: req.session.curQues.text,
-            	answers: req.session.curQues.answers
-        	};
-        	res.send(questionInfo);
-		})
-	})
-	
+    var query = "SELECT code, name FROM " +
+                "(SELECT code, name, gdp FROM Countries ORDER BY RAND() LIMIT 4) T " +
+                "ORDER BY gdp DESC";
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
+            }
+            
+            var correctCode = results[0]["code"];
+            var r = [];
+            for(var i = 0; i < results.length; i++) {
+                r[i] = results[i];
+            }
+            connection.release();
+            shuffle(r);
+            correct = 0;
+            for(var i = 0; i < r.length; i++) {
+                if(r["code"] = correctCode) {
+                    correct = i;
+                }
+            }
+            
+            var answers = [r[0]["name"], r[1]["name"], 
+                           r[2]["name"], r[3]["name"]];
+            
+            var question = "Which of these countries is the largest by gdp?"
+            setNextQuestion(req, res, question, answers, correct);     
+        });
+    });
 }
 
 // Which of these countries is smallest by gdp?
 function q8(req, res) {
-	var con = dbConnect();
-	var countries = getFourRandomCountries();
-    var names = [countries[0].Name, countries[1].Name, countries[2].Name, countries[3].Name];
-	var gdps = [];
-	var answers = [];
-	con.connect(function(err) {
-		if (err) throw err;
-		con.query("SELECT name, gdp FROM Countries WHERE name IN names", function(err, results, fields) {
-			if (err) throw err;
-			var correct = 0;
-        	for (i = 0; i < results.length; i++) {
-				gdps[i] = results[i].gdp;
- 			}
-			for (i = 0; i < gdps.length; i++) {
-				if (gdps[i] <  gdps[correct]) {
-					correct = i;
-				}
-				answers[i] = results[i].name;
-			}
-			req.session.curQues = {
-            text: "Which of these countries has the smallest GDP?",
-            answers: answers,
-            correct: correct
-        	}
-        	req.session.save(function(err){});
-        	var questionInfo = {
-            	text: req.session.curQues.text,
-            	answers: req.session.curQues.answers
-        	};
-        	res.send(questionInfo);
-		})
-	})
-	
+    var query = "SELECT code, name FROM " +
+                "(SELECT code, name, gdp FROM Countries ORDER BY RAND() LIMIT 4) T " +
+                "ORDER BY gdp";
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
+            }
+            
+            var correctCode = results[0]["code"];
+            var r = [];
+            for(var i = 0; i < results.length; i++) {
+                r[i] = results[i];
+            }
+            connection.release();
+            shuffle(r);
+            correct = 0;
+            for(var i = 0; i < r.length; i++) {
+                if(r["code"] = correctCode) {
+                    correct = i;
+                }
+            }
+            
+            var answers = [r[0]["name"], r[1]["name"], 
+                           r[2]["name"], r[3]["name"]];
+            
+            var question = "Which of these countries is the smallest by gdp?"
+            setNextQuestion(req, res, question, answers, correct);     
+        });
+    });
 }
 
 // Which of these countries is largest in population?
@@ -768,9 +768,9 @@ function q16(req, res) {
 app.get('/generate-question', function(req, res) {
     if(!req.session.finished) {
         
-        var questions = [q1, q2, q3, q4, q5, q6];
+        var questions = [q1, q2, q3, q4, q5, q6, q7, q8];
         var questionType = questions[randomInt(questions.length)];
-        questionType = questions[5]; // Override. Comment out to cancel
+        //questionType = questions[5]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
