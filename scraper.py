@@ -32,6 +32,20 @@ def parse_cities():
 				continue
 			count += 1
 			city_text = city.text.encode('utf-8').strip()
+			print(city_text)
+			if 'Paulo' in city_text:
+				city = 'San Paulo'
+			if 'Bogot' in city_text:
+				city = 'Bogota'
+			if 'zmir' in city_text:
+				city = 'Izmir'
+			if 'Bras' in city_text:
+				city = 'Brasilia'
+			if 'Yaound' in city_text:
+				city = 'Yaounde'
+			if 'rdoba' in city_text:
+				city = 'Cordoba'
+				
 			if city_text == "Xi'an":
 				continue
 			if population == ' 1029556':
