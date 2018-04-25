@@ -814,6 +814,61 @@ function q18(req, res) {
     });
 }
 
+//What is the largest city in <country>?
+function q19(req, res) {
+	var query = 
+	    "SELECT name, country FROM " +
+        "(SELECT name, countryCode, population FROM Cities) T4 " +
+        "RIGHT JOIN " +
+        "(SELECT code, name AS country FROM " +
+        "(SELECT code, name FROM Countries) T1 " +
+        "JOIN " +
+        "(SELECT countryCode FROM Cities GROUP BY (countryCode) " +
+        "HAVING (COUNT(*) > 3) ORDER BY RAND() LIMIT 1) T2 " +
+        "ON code = countryCode) T3 " +
+        "ON code = CountryCode " +
+        "ORDER BY population DESC;"
+
+                                   
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
+            }
+            var largest = results[0]["name"];
+            var indices = [0];
+            while(indices.length < 4) {
+                var random = randomIntRange(1, results.length);
+                if (indices.indexOf(random) > -1) {
+                    continue;
+                }
+                else {
+                    indices.push(random);
+                }
+            }
+            shuffle(indices);
+            
+            var country = results[0]["country"];
+            var answers = [results[indices[0]]["name"], results[indices[1]]["name"], 
+                           results[indices[2]]["name"], results[indices[3]]["name"]];
+            connection.release();
+            
+            var correct = 0;
+            for (var i = 0; i < 4; i++) {
+                if(answers[i] == largest) {
+                    correct = i;
+                }
+            }
+            
+            var question = "What is the largest city in " + country + "?";
+            setNextQuestion(req, res, question, answers, correct);     
+        });
+    });
+}
+
 /* Create a question, as well as 4 sample answers. Do not send
    the correct answer in the response. The order of the answers
    should not indicate which one is correct */
@@ -822,10 +877,10 @@ app.get('/generate-question', function(req, res) {
         
         var questions = [
             q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13,
-            q14, q15, q16, q17, q18
+            q14, q15, q16, q17, q18, q19
         ];
         var questionType = questions[randomInt(questions.length)];
-        questionType = questions[17]; // Override. Comment out to cancel
+        questionType = questions[18]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
