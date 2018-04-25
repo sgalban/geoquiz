@@ -116,6 +116,15 @@ function addCommas(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function shuffle(array) {
+    for(var i = 0; i < array.length; i++) {
+        var rand = randomInt(array.length);
+        var temp = array[i];
+        array[i] = array[rand];
+        array[rand] = temp;
+    }
+}
+
 function firstNonLetter(str) {
     var i;
     for(i = 0; i < str.length; i++){
@@ -218,10 +227,10 @@ function q1(req, res) {
             var pop = results[0]["population"];
             
             var multipliers = [
-                randomIntRange(2, 5), 
-                randomIntRange(2, 5),
-                randomIntRange(2, 5),
-                randomIntRange(2, 5)
+                randomIntRange(5, 10), 
+                randomIntRange(5, 10),
+                randomIntRange(5, 10),
+                randomIntRange(5, 10)
             ];
             var i;
             var answers = [];
@@ -264,117 +273,105 @@ function q2(req, res) {
 }
 
 // What is the capital of <country>?
-function q3(countryInfo, client, req, res) {
-    var countries = getFourRandomCountries();
-    var codes = [countries[0].Code, countries[1].Code, countries[2].Code, countries[3].Code];
-    countryInfo.find({Code: {$in: codes}}).project({_id:0, Code:1, Government:1})
-    .toArray(function(err, result) {
-        if (err) {
+function q3(req, res) {
+    var query = 
+        "SELECT name, capital FROM Countries " + 
+        "ORDER BY RAND() LIMIT 4";
+    pool.getConnection(function(err, connection) {
+        if(err) {
             throw err;
         }
-        var answers = [];
-        var i;
-        for(i = 0; i < 4; i++) {
-            var capital = result[i].Government.Capital.name.text;
-            var index = firstNonLetter(capital);
-            if(index > 0) {
-                capital = capital.substring(0, index).trim();
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
             }
-            answers[i] = capital;
-        }
-        var correct = randomInt(4);
-        var country = result[correct].Government["Country name"]["conventional short form"].text;
-        
-        req.session.curQues = {
-            text: "What is the capital of " + country + "?",
-            answers: answers,
-            correct: correct
-        }
-        req.session.save(function(err){});
-        var questionInfo = {
-            text: req.session.curQues.text,
-            answers: req.session.curQues.answers
-        };
-        res.send(questionInfo);
-        client.close();
+            
+            var correct = randomInt(4);
+            var answers = [results[0]["capital"], results[1]["capital"], 
+                           results[2]["capital"], results[3]["capital"]];
+            var country = results[correct]["name"];
+            
+            connection.release();
+            var question = "What is the capital of " + country + "?"
+            setNextQuestion(req, res, question, answers, correct);     
+        });
     });
 }
 
 // Which of these countries is the largest by area?
-function q4(countryInfo, client, req, res) {
-    var countries = getFourRandomCountries();
-    var codes = [countries[0].Code, countries[1].Code, countries[2].Code, countries[3].Code];
-    countryInfo.find({Code: {$in: codes}}).project({_id:0, Code:1, Geography:1, Government:1})
-    .toArray(function(err, result) {
-        if (err) {
+function q4(req, res) {
+    var query = "SELECT code, area, name FROM " +
+                "(SELECT code, name, area FROM Countries ORDER BY RAND() LIMIT 4) T " +
+                "ORDER BY area DESC";
+    pool.getConnection(function(err, connection) {
+        if(err) {
             throw err;
         }
-        var correct = 0;
-        var areas = [];
-        var answers = [];
-        var i;
-        for(i = 0; i < result.length; i++) {
-            areas[i] = result[i].Geography.Area.total.text;
-        }
-        for (i = 0; i < areas.length; i++) {
-            if(areas[i] > areas[correct]) {
-                correct = i;
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
             }
-            answers[i] = result[i].Government["Country name"]["conventional short form"].text;
-        }
-        
-        req.session.curQues = {
-            text: "Which of these countries is the largest by area?",
-            answers: answers,
-            correct: correct
-        }
-        req.session.save(function(err){});
-        var questionInfo = {
-            text: req.session.curQues.text,
-            answers: req.session.curQues.answers
-        };
-        res.send(questionInfo);
-        client.close();
+            
+            var correctCode = results[0]["code"];
+            var r = [];
+            for(var i = 0; i < results.length; i++) {
+                r[i] = results[i];
+            }
+            connection.release();
+            shuffle(r);
+            correct = 0;
+            for(var i = 0; i < r.length; i++) {
+                if(r["code"] = correctCode) {
+                    correct = i;
+                }
+            }
+            
+            var answers = [r[0]["name"], r[1]["name"], 
+                           r[2]["name"], r[3]["name"]];
+            
+            var question = "Which of these countries is the largest by area?"
+            setNextQuestion(req, res, question, answers, correct);     
+        });
     });
 }
 
 // Which of these countries is the smallest by area?
-function q5(countryInfo, client, req, res) {
-    var countries = getFourRandomCountries();
-    var codes = [countries[0].Code, countries[1].Code, countries[2].Code, countries[3].Code];
-    countryInfo.find({Code: {$in: codes}}).project({_id:0, Code:1, Geography:1, Government:1})
-    .toArray(function(err, result) {
-        if (err) {
+function q5(req, res) {
+    var query = "SELECT code, area, name FROM " +
+                "(SELECT code, name, area FROM Countries ORDER BY RAND() LIMIT 4) T " +
+                "ORDER BY area";
+    pool.getConnection(function(err, connection) {
+        if(err) {
             throw err;
         }
-        var correct = 0;
-        var areas = [];
-        var answers = [];
-        var i;
-        for(i = 0; i < result.length; i++) {
-            areas[i] = result[i].Geography.Area.total.text;
-        }
-        for (i = 0; i < areas.length; i++) {
-            if(areas[i] < areas[correct]) {
-                correct = i;
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
             }
-            answers[i] = result[i].Government["Country name"]["conventional short form"].text;
-        }
-        
-        req.session.curQues = {
-            text: "Which of these countries is the smallest by area?",
-            answers: answers,
-            correct: correct
-        }
-        req.session.save(function(err){});
-        var questionInfo = {
-            text: req.session.curQues.text,
-            answers: req.session.curQues.answers
-        };
-        res.send(questionInfo);
-        client.close();
+            
+            var correctCode = results[0]["code"];
+            var r = [];
+            for(var i = 0; i < results.length; i++) {
+                r[i] = results[i];
+            }
+            connection.release();
+            shuffle(r);
+            correct = 0;
+            for(var i = 0; i < r.length; i++) {
+                if(r["code"] = correctCode) {
+                    correct = i;
+                }
+            }
+            
+            var answers = [r[0]["name"], r[1]["name"], 
+                           r[2]["name"], r[3]["name"]];
+            
+            var question = "Which of these countries is the smallest by area?"
+            setNextQuestion(req, res, question, answers, correct);     
+        });
     });
 }
+
 
 // <Flag> is the flag of which country?
 function q6(countryInfo, client, req, res) {
@@ -769,9 +766,9 @@ function q16(req, res) {
 app.get('/generate-question', function(req, res) {
     if(!req.session.finished) {
         
-        var questions = [q1, q2];
+        var questions = [q1, q2, q3, q4, q5];
         var questionType = questions[randomInt(questions.length)];
-        //questionType = questions[0]; // Override. Comment out to cancel
+        //questionType = questions[3]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
