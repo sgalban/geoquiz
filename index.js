@@ -139,6 +139,16 @@ app.get("/retrieve-score", function(req, res) {
     res.send({score: req.session.score});
 });
 
+/* Retrive the top 50 global scores */
+app.get("/retrieve-all-scores", function(req, res) {
+    mongoClient.connect(mongoUri, function(err, client) {
+        var db = client.db(dbName);
+        db.collection("scores").find({}).sort({score: -1}).limit(50).toArray(function(err, result) {
+            res.send(JSON.stringify(result));
+            client.close();
+        });
+    });
+});
 
 /* Submit the user's most recent score to the database */
 app.post("/submit-score", function(req, res) {
