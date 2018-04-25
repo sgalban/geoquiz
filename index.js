@@ -204,45 +204,41 @@ app.post("/submit-score", function(req, res) {
 });
 
 // What is the population of <country>?
-function q1(countryInfo, client, req, res) {
-    var country = getRandomCountry();
-    countryInfo.findOne({Code: country.Code}, function(err, result) {
-        if (err) {
+function q1(req, res) {
+    var query = 
+        "SELECT name, population FROM Countries " + 
+        "ORDER BY RAND() LIMIT 1";
+    pool.getConnection(function(err, connection) {
+        if(err) {
             throw err;
         }
-        var popString = result["People and Society"].Population.text;
-        popString = popString.replace(/,/g, "");
-        var index = popString.indexOf(" ");
-        if(index > 0){
-            popString = popString.substring(0, index);
-        }
-        var pop = parseInt(popString);
-        var order = Math.floor(randomInt(4));
-        var multipliers = [
-            randomIntRange(2, 5), 
-            randomIntRange(2, 5),
-            randomIntRange(2, 5),
-            randomIntRange(2, 5)
-        ];
-        var i;
-        var answers = [];
-        for(i = 0; i < 4; i++) {
-            var num = Math.floor(pop * Math.pow(multipliers[i], i - order))
-            answers[i] = addCommas(num);
-        }
-        
-        req.session.curQues = {
-            text: "What is the population of " + country.Name + "?",
-            answers: answers,
-            correct: order
-        }
-        req.session.save(function(err){});
-        var questionInfo = {
-            text: req.session.curQues.text,
-            answers: req.session.curQues.answers
-        };
-        res.send(questionInfo);
-        client.close();
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
+            }
+            
+            var correct = randomInt(4);
+            var country = results[0]["name"];
+            var pop = results[0]["population"];
+            
+            var multipliers = [
+                randomIntRange(2, 5), 
+                randomIntRange(2, 5),
+                randomIntRange(2, 5),
+                randomIntRange(2, 5)
+            ];
+            var i;
+            var answers = [];
+            for(i = 0; i < 4; i++) {
+                var num = Math.floor(pop * Math.pow(multipliers[i], i - correct))
+                answers[i] = addCommas(num);
+            }
+            
+            connection.release();
+            
+            var question = "What is the population of "  + country + "?";
+            setCurQuestion(req, res, question, answers, correct);     
+        });
     });
 }
 
@@ -783,9 +779,9 @@ app.get('/generate-question', function(req, res) {
             var db = client.db(dbName);
             var countryInfo = db.collection("all");
 
-            var questions = [q1, q2, q3, q4, q5, q6];
+            var questions = [q1, q2];
             var questionType = questions[randomInt(questions.length)];
-            questionType = questions[1]; // Override. Comment out to cancel
+            //questionType = questions[0]; // Override. Comment out to cancel
             nextQuestion = questionType(req, res);        
         });
     }
