@@ -1,0 +1,38 @@
+<!doctype html5>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>GE🌎QUIZ</title>
+
+    <link rel="stylesheet" type="text/css" href="css/scoreboard.css">
+    <link rel="stylesheet" type="text/css" href="css/elements.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.2/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="scripts/scoreboard.js"></script>
+</head>
+
+<body ng-app="Scoreboard" id="starBG">
+    
+    <a id="back" href="/" >BACK</a>
+    <div id="scoreTitle">
+    Scores</div>
+    
+    <div id="scoreboardHolder" ng-controller="scoreboardController">
+        <table class="outline">
+            <tr class="header-row">
+                <td><b>Person</b></td>
+                <td><b>Score</b></td>
+                <td><b>Time</b></td>
+            </tr>
+            <tr ng-repeat="s in scoreData">
+                <td> {{ s.name }} </td>
+                <td> {{ s.score }} </td>
+                <td> {{ s.time }} </td>
+            </tr>
+        </table>
+    </div>
+    
+</body>
+
+</html>
