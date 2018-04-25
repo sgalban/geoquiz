@@ -35,8 +35,9 @@ function dbConnect() {
     // Remove
 }
 
-function setCurQuestion(req, res, text, answers, correct) {
-    req.session.curQues = {
+function setNextQuestion(req, res, text, answers, correct) {
+    req.session.curQues = req.session.nextQues;
+    req.session.nextQues = {
         text: text,
         answers: answers,
         correct: correct
@@ -46,6 +47,7 @@ function setCurQuestion(req, res, text, answers, correct) {
         text: req.session.curQues.text,
         answers: req.session.curQues.answers
     };
+    
     res.send(questionInfo);
 }
 
@@ -133,11 +135,11 @@ app.get('/', function(req, res) {
 /* Get the quiz page html */
 app.get('/quiz', function(req, res) {
     res.sendFile(path.join(__dirname, "/", "quiz.html"));
-    req.session.ready = true;
     req.session.score = 0;
     req.session.finished = false;
     req.session.submitted = true;
     req.session.curQues = {};
+    req.session.nextQues = {};
     req.session.save(function(err){});
     setTimeout(function() {
         req.session.reload(function(err){
@@ -175,12 +177,6 @@ app.get('/verify-answer', function(req, res) {
             req.session.save(function(err){});
             res.send({newScore: req.session.score, correct: false});
         }
-    
-        // Wait half a second before generating the next question
-        setTimeout(function() {
-            req.session.ready = true;
-            req.session.save(function(err){});
-        }, 500);
     }
 });
 
@@ -237,7 +233,7 @@ function q1(req, res) {
             connection.release();
             
             var question = "What is the population of "  + country + "?";
-            setCurQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct);     
         });
     });
 }
@@ -262,7 +258,7 @@ function q2(req, res) {
             
             connection.release();
             var question = capital + " is the capital of which country?"
-            setCurQuestion(req, res, question, answers, correct);     
+            setNextQuestion(req, res, question, answers, correct);     
         });
     });
 }
@@ -771,22 +767,12 @@ function q16(req, res) {
    the correct answer in the response. The order of the answers
    should not indicate which one is correct */
 app.get('/generate-question', function(req, res) {
-    if(req.session.ready && ! req.session.finished) {
-        req.session.ready = false;
+    if(!req.session.finished) {
         
-        var nextQuestion = {};
-        mongoClient.connect(mongoUri, function(err, client){
-            var db = client.db(dbName);
-            var countryInfo = db.collection("all");
-
-            var questions = [q1, q2];
-            var questionType = questions[randomInt(questions.length)];
-            //questionType = questions[0]; // Override. Comment out to cancel
-            nextQuestion = questionType(req, res);        
-        });
-    }
-    else {
-        res.send("Not Ready");
+        var questions = [q1, q2];
+        var questionType = questions[randomInt(questions.length)];
+        //questionType = questions[0]; // Override. Comment out to cancel
+        questionType(req, res);  
     }
 });
 

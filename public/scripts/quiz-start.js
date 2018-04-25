@@ -27,32 +27,25 @@ app.controller("questionController", function($scope, $http, $window) {
 
         var req = $http.get("generate-question");
         req.success(function(data) {
-            if($scope.questionData == "Not Ready") {
-                console.log("Question not ready");
+            $scope.questionData = data;
+            if(data.imageRef) {
+                $("#question-image").attr("src", data.imageRef);
+                $("#question-image").css({
+                    "width": "10%",
+                    "border-style": "solid" 
+                });
             }
-            else {
-                $scope.questionData = data;
-                if(data.imageRef) {
-                    $("#question-image").attr("src", data.imageRef);
-                    $("#question-image").css({
-                        "width": "10%",
-                        "border-style": "solid" 
-                    });
-                }
-                else{
-                    $("#question-image").css({
-                        "width": "0%",
-                        "border-style": "none" 
-                    });
-                }
+            else{
+                $("#question-image").css({
+                    "width": "0%",
+                    "border-style": "none" 
+                });
             }
         });
         req.error(function(data) {
             console.log("Error: Cannot GET question");
         });
     }
-    
-    newQuestion();
     
     $scope.verify = function($event) {
         $("#answers").css("visibility", "hidden");
@@ -79,4 +72,13 @@ app.controller("questionController", function($scope, $http, $window) {
             console.log("Error: Cannot verify answer");
         });
     }
+    
+    // We call generate question once to get nextQuestion
+    var req = $http.get("generate-question");
+        req.success(function(data) {
+            newQuestion();
+        });
+        req.error(function(data) {
+            console.log("Error: Cannot GET question");
+        });
 });
