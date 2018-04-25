@@ -22,9 +22,9 @@ for i in range(94):
 	gdp_factor = gdp.split(" ")[1]
 	gdp = float(gdp.split(" ")[0])
 	if gdp_factor == "trillion":
-		gdp *= 1000000000000
+		gdp *= 1000000
 	else:
-		gdp *= 1000000000
+		gdp *= 1000
 	gdp = str(gdp)
 	gdp = gdp.split(".")[0]
 	continent = ""
@@ -52,5 +52,6 @@ for i in range(94):
 		gdp + ",\"" + \
 		continent + "\");\n"
 	sql_file.write(query)
+
 
 sql_file.close()
