@@ -32,10 +32,6 @@ var pool = mysql.createPool({
 
 const continents = ["North America", "South America", "Asia", "Africa", "Europe"];
 
-function dbConnect() {
-    // Remove
-}
-
 function setNextQuestion(req, res, text, answers, correct, imgRef=undefined) {
     req.session.curQues = req.session.nextQues;
     req.session.nextQues = {
@@ -66,55 +62,6 @@ function randomInt(max) {
     return randomIntRange(0, max);
 }
 
-function getRandomCountry() {
-    return countries[randomInt(countries.length)];
-}
-
-function getFourRandomCountries() {
-	var con = dbConnect();
-    con.connect(function(err) {
-		if(err) throw err;
-		var countries = [];
-		con.query("SELECT name FROM Countries ORDER BY RAND() LIMIT 4", function(err, results, fields) {
-			if (err) throw err;
-			for (i = 0; i < results.length; i++) {
-				countries.push(results[i].name);
-			}
-			return countries;
-		})
-	})
-}
-
-function getFourRandomCities() {
-	var con = dbConnect();
-    con.connect(function(err) {
-		if(err) throw err;
-		var cities = [];
-		con.query("SELECT name FROM Cities ORDER BY RAND() LIMIT 4", function(err, results, fields) {
-			if (err) throw err;
-			for (i = 0; i < results.length; i++) {
-				cities.push(results[i].name);
-			}
-			return cities;
-		})
-	})
-}
-
-function getFourRandomMtns() {
-	var con = dbConnect();
-    con.connect(function(err) {
-		if(err) throw err;
-		var mtns = [];
-		con.query("SELECT name FROM Mountains ORDER BY RAND() LIMIT 4", function(err, results, fields) {
-			if (err) throw err;
-			for (i = 0; i < results.length; i++) {
-				mtns.push(results[i].name);
-			}
-			return mtns;
-		})
-	})
-}
-
 function addCommas(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -126,17 +73,6 @@ function shuffle(array) {
         array[i] = array[rand];
         array[rand] = temp;
     }
-}
-
-function firstNonLetter(str) {
-    var i;
-    for(i = 0; i < str.length; i++){
-        var c = str.charAt(i).toUpperCase();
-        if(c != " " && (c < "A" || c > "Z")) {
-            return i;
-        }
-    }
-    return -1;
 }
 
 /* Get the main page html */
@@ -744,36 +680,135 @@ function q14(req, res) {
 
 //Which of these countries is <Mountain> in?
 function q15(req, res) {
-	var query1 = "SELECT name, countryCode FROM Mountains ORDER BY RAND() LIMIT 1";
+	var query = 
+	    "SELECT code, country, name FROM " +
+        "(SELECT Countries.code, Countries.name AS country, Mountains.name " +
+        "FROM Countries JOIN Mountains " +
+        "ON Countries.code = Mountains.countryCode " +
+        "ORDER BY RAND()) T " +
+        "GROUP BY (country) " +
+        "ORDER BY RAND() LIMIT 4;"
+                                   
     pool.getConnection(function(err, connection) {
         if(err) {
             throw err;
         }
-        connection.query(query1, function(error, results, fields) {
+        connection.query(query, function(error, results, fields) {
             
             if(error) {
                 throw error;
             }
+            var correct = randomInt(4)
             
-            var correctCode = results[0]["name"];
-            var r = [];
-            for(var i = 0; i < results.length; i++) {
-                r[i] = results[i];
-            }
+            var mountain = results[correct]["name"];
+            
+            var answers = [results[0]["country"], results[1]["country"], 
+                           results[2]["country"], results[3]["country"]];
             connection.release();
-            console.log(r);
-            shuffle(r);
-            correct = 0;
-            for(var i = 0; i < r.length; i++) {
-                if(r[i]["name"] == correctCode) {
-                    correct = i;
-                }
+            
+            var question = "Which of these countries is " + mountain + " found in?";
+            setNextQuestion(req, res, question, answers, correct);     
+        });
+    });
+}
+
+//Which of these mountains is in <country>?
+function q16(req, res) {
+	var query = 
+	    "SELECT code, country, name FROM " +
+        "(SELECT Countries.code, Countries.name AS country, Mountains.name " +
+        "FROM Countries JOIN Mountains " +
+        "ON Countries.code = Mountains.countryCode " +
+        "ORDER BY RAND()) T " +
+        "GROUP BY (country) " +
+        "ORDER BY RAND() LIMIT 4;"
+                                   
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            
+            if(error) {
+                throw error;
             }
+            var correct = randomInt(4)
             
-            var answers = [r[0]["name"], r[1]["name"], 
-                           r[2]["name"], r[3]["name"]];
+            var country = results[correct]["country"];
             
-            var question = "Which of these mountains is the shortest?";
+            var answers = [results[0]["name"], results[1]["name"], 
+                           results[2]["name"], results[3]["name"]];
+            connection.release();
+            
+            var question = "Which of these mountains is in " + country + "?";
+            setNextQuestion(req, res, question, answers, correct);     
+        });
+    });
+}
+
+//Which of these countries is <city> in?
+function q17(req, res) {
+	var query = 
+	    "SELECT code, country, name FROM " +
+        "(SELECT Countries.code, Countries.name AS country, Cities.name " +
+        "FROM Countries JOIN Cities " +
+        "ON Countries.code = Cities.countryCode " +
+        "ORDER BY RAND()) T " +
+        "GROUP BY (country) " +
+        "ORDER BY RAND() LIMIT 4;"
+                                   
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            
+            if(error) {
+                throw error;
+            }
+            var correct = randomInt(4)
+            
+            var city = results[correct]["name"];
+            
+            var answers = [results[0]["country"], results[1]["country"], 
+                           results[2]["country"], results[3]["country"]];
+            connection.release();
+            
+            var question = "Which of these countries is " + city + " found in?";
+            setNextQuestion(req, res, question, answers, correct);     
+        });
+    });
+}
+
+//Which of these cities is in <country>?
+function q18(req, res) {
+	var query = 
+	    "SELECT code, country, name FROM " +
+        "(SELECT Countries.code, Countries.name AS country, Cities.name " +
+        "FROM Countries JOIN Cities " +
+        "ON Countries.code = Cities.countryCode " +
+        "ORDER BY RAND()) T " +
+        "GROUP BY (country) " +
+        "ORDER BY RAND() LIMIT 4;"
+                                   
+    pool.getConnection(function(err, connection) {
+        if(err) {
+            throw err;
+        }
+        connection.query(query, function(error, results, fields) {
+            
+            if(error) {
+                throw error;
+            }
+            var correct = randomInt(4)
+            
+            var country = results[correct]["country"];
+            
+            var answers = [results[0]["name"], results[1]["name"], 
+                           results[2]["name"], results[3]["name"]];
+            connection.release();
+            
+            var question = "Which of these cities is in " + country + "?";
             setNextQuestion(req, res, question, answers, correct);     
         });
     });
@@ -787,10 +822,10 @@ app.get('/generate-question', function(req, res) {
         
         var questions = [
             q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13,
-            q14
+            q14, q15, q16, q17, q18
         ];
         var questionType = questions[randomInt(questions.length)];
-        questionType = questions[13]; // Override. Comment out to cancel
+        questionType = questions[17]; // Override. Comment out to cancel
         questionType(req, res);  
     }
 });
