@@ -9,7 +9,6 @@ var app = express();
 
 const mongoUri = "mongodb://geo_dev:geo_dev@ds039674.mlab.com:39674/cis450_geoquiz";
 const dbName = "cis450_geoquiz";
-var countries = [];
 
 app.set('port', (process.env.PORT || 8888));
 app.use(express.static(__dirname + '/public'));
@@ -23,46 +22,35 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+var pool = mysql.createPool({
+    host        : "geoquizid.cglhz5b6lacy.us-east-2.rds.amazonaws.com",
+    user        : "geoquiz_user",
+    password    : "geopassword",
+    database    : "geoquiz",
+    port        : 3306
+});
+
+
 function dbConnect() {
-    var connection = mysql.createConnection({
-        host        : "geoquizid.cglhz5b6lacy.us-east-2.rds.amazonaws.com",
-        user        : "geoquiz_user",
-        password    : "geopassword",
-        database    : "geoquiz",
-        port        : 3306
-    });
-    connection.connect(function(error) {
-        if(error){
-            console.log("Error connecting to database");    
-            throw error;
-        }
-        else{
-            console.log("Successfully connected to database");
-        }
-    });
-    return connection;
+    // Remove
 }
 
-/* Get all the countries */
+function setCurQuestion(req, res, text, answers, correct) {
+    req.session.curQues = {
+        text: text,
+        answers: answers,
+        correct: correct
+    }
+    req.session.save(function(err){});
+    var questionInfo = {
+        text: req.session.curQues.text,
+        answers: req.session.curQues.answers
+    };
+    res.send(questionInfo);
+}
+
 app.listen(app.get('port'), function() {
-  console.log("Node app is running at localhost:" + app.get('port'));
-  mongoClient.connect(mongoUri, function(err, client){
-        var db = client.db(dbName);
-        db.collection("all").find({}).project({Code: 1, Government: 1, _id: 0}).toArray(function(err, res) {
-            if(err) {
-                throw err;
-            }
-            var i;
-            for(i = 0; i < res.length; i++) {
-                var entry = {
-                    Code:  res[i].Code,
-                    Name:  res[i].Government["Country name"]["conventional short form"].text
-                }
-                countries.push(entry);
-            }
-            client.close();
-        });
-    });
+    console.log("Node app is running at localhost:" + app.get('port'));
 });
 
 function randomIntRange(min, max) {
@@ -149,6 +137,7 @@ app.get('/quiz', function(req, res) {
     req.session.score = 0;
     req.session.finished = false;
     req.session.submitted = true;
+    req.session.curQues = {};
     req.session.save(function(err){});
     setTimeout(function() {
         req.session.reload(function(err){
@@ -258,38 +247,27 @@ function q1(countryInfo, client, req, res) {
 }
 
 // <Capital> is the capital of which country?
-function q2(countryInfo, client, req, res) {
-    var countries = getFourRandomCountries();
-    var codes = [countries[0].Code, countries[1].Code, countries[2].Code, countries[3].Code];
-    countryInfo.find({Code: {$in: codes}}).project({_id:0, Code:1, Government:1})
-    .toArray(function(err, result) {
-        if (err) {
+function q2(req, res) {
+    var query = 
+        "SELECT name, capital FROM Countries " + 
+        "ORDER BY RAND() LIMIT 4";
+    pool.getConnection(function(err, connection) {
+        if(err) {
             throw err;
         }
-        var answers = [];
-        var i;
-        for(i = 0; i < 4; i++) {
-            answers[i] = result[i].Government["Country name"]["conventional short form"].text;
-        }
-        var correct = randomInt(4);
-        var capital = result[correct].Government.Capital.name.text;
-        var index = firstNonLetter(capital);
-        if(index > 0) {
-            capital = capital.substring(0, index).trim();
-        }
-        
-        req.session.curQues = {
-            text: capital + " is the capital of which country?",
-            answers: answers,
-            correct: correct
-        }
-        req.session.save(function(err){});
-        var questionInfo = {
-            text: req.session.curQues.text,
-            answers: req.session.curQues.answers
-        };
-        res.send(questionInfo);
-        client.close();
+        connection.query(query, function(error, results, fields) {
+            if(error) {
+                throw error;
+            }
+            
+            var correct = randomInt(4);
+            var answers = [results[0]["name"], results[1]["name"], results[2]["name"], results[3]["name"]];
+            var capital = results[correct]["capital"];
+            
+            connection.release();
+            var question = capital + " is the capital of which country?"
+            setCurQuestion(req, res, question, answers, correct);     
+        });
     });
 }
 
@@ -429,8 +407,6 @@ function q6(countryInfo, client, req, res) {
     client.close();
     
 }
-
-
 
 // Which of these countries is largest by gdp?
 function q7(req, res) {
@@ -744,7 +720,7 @@ function q15(req, res) {
 				answers[i] = results[i].name;
 			}
 			req.session.curQues = {
-            text: "Which of these mountains has the greatest elevation?",
+            text: "Which of these mountains is the tallest?",
             answers: answers,
             correct: correct
         	}
@@ -781,7 +757,7 @@ function q16(req, res) {
 				answers[i] = results[i].name;
 			}
 			req.session.curQues = {
-            text: "Which of these mountains has the smallest elevation?",
+            text: "Which of these mountains is the smallest?",
             answers: answers,
             correct: correct
         	}
@@ -809,8 +785,8 @@ app.get('/generate-question', function(req, res) {
 
             var questions = [q1, q2, q3, q4, q5, q6];
             var questionType = questions[randomInt(questions.length)];
-            //questionType = questions[5]; // Override. Comment out to cancel
-            nextQuestion = questionType(countryInfo, client, req, res);        
+            questionType = questions[1]; // Override. Comment out to cancel
+            nextQuestion = questionType(req, res);        
         });
     }
     else {
