@@ -151,7 +151,7 @@ VALUES("gh","Ghana",26908262,"Accra",238533,120800,"Africa");
 INSERT INTO Countries
 VALUES("fi","Finland",5498211,"Helsinki",338145,230000,"Europe");
 INSERT INTO Countries
-VALUES("ez","Czechia",10644842,"Prague",78867,350900,"Europe");
+VALUES("ez","Czech Republic",10644842,"Prague",78867,350900,"Europe");
 INSERT INTO Countries
 VALUES("et","Ethiopia",102374044,"Addis Ababa",1104300,174700,"Africa");
 INSERT INTO Countries
@@ -186,3 +186,43 @@ INSERT INTO Countries
 VALUES("aj","Azerbaijan",9872765,"Baku",86600,167900,"Asia");
 INSERT INTO Countries
 VALUES("ag","Algeria",40263711,"Algiers",2381741,609400,"Africa");
+INSERT INTO Countries
+VALUES("ae","United Arab Emirates",5927482,"Abu Dhabi",83600,667200,"Africa");
+INSERT INTO Countries
+VALUES("zi","Zimbabwe",14546961,"Harare",390757,28330,"Africa");
+INSERT INTO Countries
+VALUES("za","Zambia",15510711,"Lusaka",752618,65170,"Africa");
+INSERT INTO Countries
+VALUES("ym","Yemen",27392779,"Sanaa",527968,73450,"Africa");
+INSERT INTO Countries
+VALUES("uv","Burkina Faso",19512533,"Ouagadougou",274200,32990,"Africa");
+INSERT INTO Countries
+VALUES("ug","Uganda",38319241,"Kampala",241038,84930,"Africa");
+INSERT INTO Countries
+VALUES("sg","Senegal",14320055,"Dakar",196722,39720,"Africa");
+INSERT INTO Countries
+VALUES("nu","Nicaragua",5966798,"Managua",130370,33490,"South America");
+INSERT INTO Countries
+VALUES("np","Nepal",29033914,"Kathmandu",147181,71520,"Asia");
+INSERT INTO Countries
+VALUES("mz","Mozambique",25930150,"Maputo",799380,35310,"Africa");
+INSERT INTO Countries
+VALUES("kn","Korea, North",25115311,"Pyongyang",120538,40000,"Asia");
+INSERT INTO Countries
+VALUES("iv","Ivory Coast",23740424,"Yamoussoukro",322463,87120,"Africa");
+INSERT INTO Countries
+VALUES("gg","Georgia",4928052,"Tbilisi",69700,37380,"Asia");
+INSERT INTO Countries
+VALUES("cu","Cuba",11179995,"Havana",110860,128500,"South America");
+INSERT INTO Countries
+VALUES("cg","DR Congo",81331050,"Kinshasa",2344858,66010,"Africa");
+INSERT INTO Countries
+VALUES("cf","Congo Republic",4852412,"Brazzaville",342000,30270,"Africa");
+INSERT INTO Countries
+VALUES("cb","Cambodia",15957223,"Phnom Penh",181035,58940,"Asia");
+INSERT INTO Countries
+VALUES("bm","Myanmar",56890418,"Rangoon",676578,311100,"Asia");
+INSERT INTO Countries
+VALUES("am","Armenia",3051250,"Yerevan",29743,26560,"Asia");
+INSERT INTO Countries
+VALUES("af","Afghanistan",33332025,"Kabul",652230,64080,"Asia");

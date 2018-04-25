@@ -4,7 +4,7 @@ from pprint import pprint
 data = json.load(open('all.json'))
 
 sql_file = open("populate_countries.sql", "w")
-for i in range(94):
+for i in range(114):
 	code = data[i]["Code"]
 	name = data[i]["Government"]["Country name"]["conventional short form"]["text"]
 	pop = data[i]["People and Society"]["Population"]["text"]
