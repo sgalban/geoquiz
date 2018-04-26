@@ -5,7 +5,7 @@ HOW TO RUN THE APP:
 
 1) cd into geoquiz
 2) Enter: npm start
-3) Enter: localhost:8888 in browser
+3) Enter: localhost:8888 in browser, may need to run in Chrome
 
 HOW TO INTERACT/QUERY DATABASE:
 
